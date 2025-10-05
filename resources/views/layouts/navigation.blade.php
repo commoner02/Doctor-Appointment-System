@@ -98,3 +98,13 @@
         </div>
     </div>
 </nav>
+
+@if (Auth::user()->isPatient())
+    <!-- Add these menu items -->
+    <x-dropdown-link href="{{ route('doctors.browse') }}">
+        {{ __('Find Doctors') }}
+    </x-dropdown-link>
+    <x-dropdown-link href="{{ route('appointments.my') }}">
+        {{ __('My Appointments') }}
+    </x-dropdown-link>
+@endif
