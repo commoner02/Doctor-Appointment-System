@@ -13,12 +13,12 @@ class DoctorController extends Controller
         $departments = Department::with('doctors')->get();
         $doctors = Doctor::with('department', 'user')->get();
         
-        return view('doctors.browse', compact('departments', 'doctors'));
+        return view('doctor.browse', compact('departments', 'doctors'));
     }
 
     public function show(Doctor $doctor)
     {
         $doctor->load('department', 'schedules.chamber');
-        return view('doctors.show', compact('doctor'));
+        return view('doctor.show', compact('doctor'));
     }
 }

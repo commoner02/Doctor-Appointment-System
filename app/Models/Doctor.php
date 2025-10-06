@@ -15,6 +15,8 @@ class Doctor extends Model
         'last_name',
         'speciality',
         'phone',
+        'medical_license',
+        'qualifications',
     ];
 
     //Relationships

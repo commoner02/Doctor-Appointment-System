@@ -26,6 +26,13 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        $user = $request->user();
+
+        if (!$user->canLogin()) {
+            Auth::guard('web')->logout();
+            return redirect()->route('login')->withErrors(['email' => 'Your account is not active. Please contact support.']);
+        }
+
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));

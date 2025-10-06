@@ -12,19 +12,17 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        if ($user->isAdmin()) {
-            return redirect()->route('admin.dashboard');
+        // Redirect based on user role with fallback
+        switch($user->role) {
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+            case 'doctor':
+                return redirect()->route('doctor.dashboard');
+            case 'patient':
+                return redirect()->route('patient.dashboard');
+            default:
+                // Fallback for unknown roles
+                return view('dashboard-simple', compact('user'));
         }
-        
-        if ($user->isDoctor()) {
-            return redirect()->route('doctor.dashboard');
-        }
-        
-        if ($user->isPatient()) {
-            return redirect()->route('patient.dashboard');
-        }
-        
-        // Default fallback
-        return view('dashboard');
     }
 }

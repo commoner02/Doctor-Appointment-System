@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -21,7 +19,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'role',
+        'status',
+        'registration_data',
     ];
 
     /**
@@ -39,31 +39,59 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'registration_data' => 'array',
+    ];
+
+    // Relationships
+    public function doctor()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-    
-    //Relationships
-    public function patient(){
-        return $this->hasOne(Patient::Class);
+        return $this->hasOne(Doctor::class);
     }
 
-    public function doctor(){
-        return $this->hasOne(Doctor::Class);
+    public function patient()
+    {
+        return $this->hasOne(Patient::class);
     }
 
-    public function isAdmin(){
+    // Helper methods for role checking
+    public function isAdmin()
+    {
         return $this->role === 'admin';
     }
-    public function isPatient(){
+
+    public function isPatient()
+    {
         return $this->role === 'patient';
     }
-    public function isDoctor(){
-        return $this->role === 'doctor';
+
+    public function isDoctor()
+    {
+        return $this->role === 'doctor' && $this->status === 'active' && $this->doctor;
     }
 
+    public function isPendingDoctor()
+    {
+        return $this->role === 'doctor' && $this->status === 'pending';
+    }
+
+    public function canLogin()
+    {
+        return $this->status === 'active';
+    }
+
+
+    // Safe method to get doctor ID
+    public function getDoctorId()
+    {
+        return $this->doctor ? $this->doctor->id : null;
+    }
+
+    // Safe method to get patient ID
+    public function getPatientId()
+    {
+        return $this->patient ? $this->patient->id : null;
+    }
 }
