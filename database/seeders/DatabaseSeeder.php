@@ -7,6 +7,9 @@ use App\Models\User;
 use App\Models\Department;
 use App\Models\Doctor;
 use App\Models\Patient;
+use App\Models\Chamber;
+use App\Models\Schedule;
+use App\Models\Appointment;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -45,7 +48,6 @@ class DatabaseSeeder extends Seeder
             'name' => 'Pediatrics',
             'description' => 'Medical care for infants, children, and adolescents.'
         ]);
-        +
 
         $gynecology = Department::create([
             'name' => 'Gynecology',
@@ -61,7 +63,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        Doctor::create([
+        $doctor1 = Doctor::create([
             'user_id' => $doctorUser1->id,
             'department_id' => $cardiology->id,
             'first_name' => 'John',
@@ -81,7 +83,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        Doctor::create([
+        $doctor2 = Doctor::create([
             'user_id' => $doctorUser2->id,
             'department_id' => $neurology->id,
             'first_name' => 'Sarah',
@@ -101,7 +103,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        Doctor::create([
+        $doctor3 = Doctor::create([
             'user_id' => $doctorUser3->id,
             'department_id' => $orthopedics->id,
             'first_name' => 'Michael',
@@ -112,7 +114,7 @@ class DatabaseSeeder extends Seeder
             'qualifications' => 'MBBS, MS (Orthopedics), Fellowship in Joint Replacement Surgery',
         ]);
 
-        // Create Pending Doctor (for testing approval process)
+        // Create Pending Doctor
         $pendingDoctorUser = User::create([
             'name' => 'Dr. Emily Davis',
             'email' => 'dr.emilydavis@hospital.com',
@@ -139,7 +141,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        Patient::create([
+        $patient1 = Patient::create([
             'user_id' => $patientUser1->id,
             'first_name' => 'Jane',
             'last_name' => 'Wilson',
@@ -157,7 +159,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        Patient::create([
+        $patient2 = Patient::create([
             'user_id' => $patientUser2->id,
             'first_name' => 'Robert',
             'last_name' => 'Garcia',
@@ -175,7 +177,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        Patient::create([
+        $patient3 = Patient::create([
             'user_id' => $patientUser3->id,
             'first_name' => 'Maria',
             'last_name' => 'Rodriguez',
@@ -185,11 +187,122 @@ class DatabaseSeeder extends Seeder
             'address' => '321 Pine Street, Los Angeles, CA 90210',
         ]);
 
+        // Create Chambers
+        $chamber1 = Chamber::create([
+            'doctor_id' => $doctor1->id,
+            'chamber_name' => 'Cardiology Center - Room 101',
+            'chamber_location' => 'Main Building, 1st Floor',
+            'phone' => '+1-555-1001',
+        ]);
+
+        $chamber2 = Chamber::create([
+            'doctor_id' => $doctor2->id,
+            'chamber_name' => 'Neurology Clinic - Room 205',
+            'chamber_location' => 'Medical Tower, 2nd Floor',
+            'phone' => '+1-555-1002',
+        ]);
+
+        $chamber3 = Chamber::create([
+            'doctor_id' => $doctor3->id,
+            'chamber_name' => 'Orthopedic Surgery Suite - Room 301',
+            'chamber_location' => 'Surgery Wing, 3rd Floor',
+            'phone' => '+1-555-1003',
+        ]);
+
+        // Create Schedules
+        Schedule::create([
+            'doctor_id' => $doctor1->id,
+            'chamber_id' => $chamber1->id,
+            'day' => 'Monday',
+            'start_time' => '09:00:00',
+            'end_time' => '17:00:00',
+            'slot_duration' => 30,
+            'is_available' => true,
+        ]);
+
+        Schedule::create([
+            'doctor_id' => $doctor1->id,
+            'chamber_id' => $chamber1->id,
+            'day' => 'Wednesday',
+            'start_time' => '10:00:00',
+            'end_time' => '16:00:00',
+            'slot_duration' => 30,
+            'is_available' => true,
+        ]);
+
+        Schedule::create([
+            'doctor_id' => $doctor2->id,
+            'chamber_id' => $chamber2->id,
+            'day' => 'Tuesday',
+            'start_time' => '08:00:00',
+            'end_time' => '14:00:00',
+            'slot_duration' => 45,
+            'is_available' => true,
+        ]);
+
+        Schedule::create([
+            'doctor_id' => $doctor2->id,
+            'chamber_id' => $chamber2->id,
+            'day' => 'Thursday',
+            'start_time' => '10:00:00',
+            'end_time' => '16:00:00',
+            'slot_duration' => 45,
+            'is_available' => true,
+        ]);
+
+        Schedule::create([
+            'doctor_id' => $doctor3->id,
+            'chamber_id' => $chamber3->id,
+            'day' => 'Monday',
+            'start_time' => '14:00:00',
+            'end_time' => '18:00:00',
+            'slot_duration' => 60,
+            'is_available' => true,
+        ]);
+
+        // Create Sample Appointments
+        Appointment::create([
+            'patient_id' => $patient1->id,
+            'doctor_id' => $doctor1->id,
+            'chamber_id' => $chamber1->id,
+            'schedule_id' => 1,
+            'appointment_date' => '2025-10-14',
+            'status' => 'confirmed',
+            'reason' => 'Chest pain and shortness of breath',
+        ]);
+
+        Appointment::create([
+            'patient_id' => $patient2->id,
+            'doctor_id' => $doctor2->id,
+            'chamber_id' => $chamber2->id,
+            'schedule_id' => 3,
+            'appointment_date' => '2025-10-15',
+            'status' => 'pending',
+            'reason' => 'Recurring headaches',
+        ]);
+
+        Appointment::create([
+            'patient_id' => $patient3->id,
+            'doctor_id' => $doctor3->id,
+            'chamber_id' => $chamber3->id,
+            'schedule_id' => 5,
+            'appointment_date' => '2025-10-14',
+            'status' => 'confirmed',
+            'reason' => 'Knee pain evaluation',
+        ]);
+
         echo "\n=== Database Seeded Successfully ===\n";
-        echo "Admin Login: admin@hospital.com / password\n";
-        echo "Doctor Login: dr.johnsmith@hospital.com / password\n";
-        echo "Patient Login: jane.wilson@email.com / password\n";
+        echo "Admin: admin@hospital.com / password\n";
+        echo "Doctor1: dr.johnsmith@hospital.com / password\n";
+        echo "Patient1: jane.wilson@email.com / password\n";
         echo "Pending Doctor: dr.emilydavis@hospital.com (needs admin approval)\n";
+        echo "=== Sample Data Created ===\n";
+        echo "- 5 Departments\n";
+        echo "- 3 Active Doctors + 1 Pending Doctor\n";
+        echo "- 3 Patients\n";
+        echo "- 3 Chambers\n";
+        echo "- 5 Schedules\n";
+        echo "- 3 Appointments\n";
         echo "======================================\n";
     }
 }
