@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('chambers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('doctor_id')->constrained()->cascadeOnDelete();
-            $table->string('chamber_name');
-            $table->text('chamber_location');
-            $table->string('phone');
+            $table->foreignId('doctor_id')->constrained()->onDelete('cascade');
+            $table->string('chamber_name', 100);
+            $table->string('chamber_location', 255)->nullable();
+            $table->string('phone', 20)->nullable();
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->set('working_days', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']);
             $table->timestamps();
         });
     }

@@ -20,8 +20,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'status',
-        'registration_data',
+        'is_verified',
     ];
 
     /**
@@ -69,29 +68,25 @@ class User extends Authenticatable
 
     public function isDoctor()
     {
-        return $this->role === 'doctor' && $this->status === 'active' && $this->doctor;
+        return $this->role === 'doctor';
     }
 
-    public function isPendingDoctor()
+    public function isVerifiedDoctor()
     {
-        return $this->role === 'doctor' && $this->status === 'pending';
+        return $this->isDoctor() && $this->is_verified;
     }
 
+    // Check if user can login
     public function canLogin()
     {
-        return $this->status === 'active';
-    }
-
-
-    // Safe method to get doctor ID
-    public function getDoctorId()
-    {
-        return $this->doctor ? $this->doctor->id : null;
-    }
-
-    // Safe method to get patient ID
-    public function getPatientId()
-    {
-        return $this->patient ? $this->patient->id : null;
+        if ($this->isAdmin() || $this->isPatient()) {
+            return true;
+        }
+        
+        if ($this->isDoctor()) {
+            return $this->is_verified;
+        }
+        
+        return false;
     }
 }

@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('doctors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
-            $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('speciality');
             $table->string('phone');
+            $table->string('license_no', 50);
+            $table->text('qualifications');
             $table->timestamps();
         });
     }

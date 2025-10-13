@@ -13,18 +13,36 @@ class Chamber extends Model
         'chamber_name',
         'chamber_location',
         'phone',
+        'start_time',
+        'end_time',
+        'working_days'
     ];
 
-    //Relationships
-    public function doctor(){
-        return $this->belongsTo(Doctor::Class);
+    protected $casts = [
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i'
+    ];
+
+    // Relationships
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
     }
 
-    public function schedules(){
-        return $this->hasMany(Schedule::Class);
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
     }
 
-    public function appointments(){
-        return $this->hasMany(Appointment::Class);
+    // Convert working_days to array when getting from database
+    public function getWorkingDaysAttribute($value)
+    {
+        return explode(',', $value);
+    }
+
+    // Convert working_days to string when saving to database
+    public function setWorkingDaysAttribute($value)
+    {
+        $this->attributes['working_days'] = is_array($value) ? implode(',', $value) : $value;
     }
 }

@@ -15,16 +15,21 @@ class Patient extends Model
         'last_name',
         'gender',
         'phone',
-        'address',
         'date_of_birth',
+        'blood_group',
+        'address',
+    ];
+
+    protected $casts = [
+        'date_of_birth' => 'date',
     ];
 
     //Relationships
     public function user(){
-        return $this->belongsTo(User::Class);
+        return $this->belongsTo(User::class);
     }
 
     public function appointments(){
-        return $this->hasMany(Appointment::Class);
+        return $this->hasMany(Appointment::class);
     }
 }

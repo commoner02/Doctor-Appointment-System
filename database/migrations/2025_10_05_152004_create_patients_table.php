@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('gender');
+            $table->string('blood_group');
             $table->string('phone');
             $table->date('date_of_birth');
             $table->text('address');
