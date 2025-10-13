@@ -10,33 +10,24 @@ class Doctor extends Model
 
     protected $fillable = [
         'user_id',
-        'department_id',
         'first_name',
         'last_name',
         'speciality',
         'phone',
-        'medical_license',
+        'license_no',
         'qualifications',
     ];
 
     //Relationships
     public function user(){
-        return $this->belongsTo(User::Class);
-    }
-
-    public function department(){
-        return $this->belongsTo(Department::Class);
+        return $this->belongsTo(User::class);
     }
 
     public function chambers(){
-        return $this->hasMany(Chamber::Class);
-    }
-
-    public function schedules(){
-        return $this->hasMany(Schedule::Class);
+        return $this->hasMany(Chamber::class);
     }
 
     public function appointments(){
-        return $this->hasMany(Appointment::Class);
+        return $this->hasMany(Appointment::class);
     }
 }
