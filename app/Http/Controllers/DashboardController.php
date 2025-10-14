@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Department;
-use App\Models\Appointment;
 
 class DashboardController extends Controller
 {
@@ -12,17 +10,23 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        // Redirect based on user role with fallback
-        switch($user->role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'doctor':
-                return redirect()->route('doctor.dashboard');
-            case 'patient':
-                return redirect()->route('patient.dashboard');
-            default:
-                // Fallback for unknown roles
-                return view('dashboard-simple', compact('user'));
+        // Redirect based on role
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
         }
+        
+        if ($user->isPatient()) {
+            return redirect()->route('patient.dashboard');
+        }
+        
+        if ($user->isDoctor()) {
+            if ($user->is_verified) {
+                return redirect()->route('doctor.dashboard');
+            } else {
+                return redirect()->route('guest.waiting');
+            }
+        }
+
+        return redirect('/');
     }
 }
