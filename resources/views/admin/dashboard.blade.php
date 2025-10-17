@@ -3,161 +3,117 @@
 @section('title', 'Admin Dashboard')
 
 @section('content')
-    <div class="container-fluid">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Admin Dashboard</h1>
-            <p class="page-subtitle">Manage users, verify doctors, and monitor system activity</p>
-        </div>
+    <div class="container">
+        <h2 class="mb-4">Admin Dashboard</h2>
 
-        <!-- Quick Stats -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">{{ \App\Models\User::count() }}</h3>
-                            <p class="mb-0 opacity-75">Total Users</p>
-                        </div>
-                        <i class="fas fa-users fa-2x opacity-75"></i>
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3>{{ $totalAppointments }}</h3>
+                        <p class="text-muted mb-0">Total Appointments</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="stats-card success">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">
-                                {{ \App\Models\User::where('role', 'doctor')->where('is_verified', true)->count() }}</h3>
-                            <p class="mb-0 opacity-75">Verified Doctors</p>
-                        </div>
-                        <i class="fas fa-user-md fa-2x opacity-75"></i>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3>{{ $totalDoctors }}</h3>
+                        <p class="text-muted mb-0">Total Doctors</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="stats-card warning">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">
-                                {{ \App\Models\User::where('role', 'doctor')->where('is_verified', false)->count() }}</h3>
-                            <p class="mb-0 opacity-75">Pending Doctors</p>
-                        </div>
-                        <i class="fas fa-clock fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card info">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">{{ \App\Models\Appointment::count() }}</h3>
-                            <p class="mb-0 opacity-75">Total Appointments</p>
-                        </div>
-                        <i class="fas fa-calendar-check fa-2x opacity-75"></i>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3>{{ $totalPatients }}</h3>
+                        <p class="text-muted mb-0">Total Patients</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Recent Appointments -->
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Recent Appointments</h5>
-                    </div>
-                    <div class="card-body">
-                        @if($recentAppointments->count() > 0)
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Patient</th>
-                                            <th>Doctor</th>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($recentAppointments as $appointment)
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar-circle me-3"
-                                                            style="width: 40px; height: 40px; background: #f0f9ff; color: #0369a1;">
-                                                            {{ substr($appointment->patient->first_name, 0, 1) }}
-                                                        </div>
-                                                        <div>
-                                                            <strong>{{ $appointment->patient->first_name }}
-                                                                {{ $appointment->patient->last_name }}</strong>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar-circle me-3"
-                                                            style="width: 40px; height: 40px; background: #e0e7ff; color: #3730a3;">
-                                                            {{ substr($appointment->doctor->first_name, 0, 1) }}
-                                                        </div>
-                                                        <div>
-                                                            <strong>Dr. {{ $appointment->doctor->first_name }}
-                                                                {{ $appointment->doctor->last_name }}</strong>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>{{ $appointment->appointment_date->format('M d, Y H:i') }}</td>
-                                                <td>
-                                                    <span class="badge bg-warning">{{ ucfirst($appointment->status) }}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="text-center py-5">
-                                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No recent appointments</h5>
-                            </div>
-                        @endif
-                    </div>
-                </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Pending Doctor Verifications</h5>
             </div>
+            <div class="card-body">
+                @if($pendingDoctors->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Speciality</th>
+                                    <th>License</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingDoctors as $user)
+                                    <tr>
+                                        <td>{{ $user->doctor->first_name }} {{ $user->doctor->last_name }}</td>
+                                        <td>{{ $user->email }}</td>
+                                        <td>{{ $user->doctor->speciality }}</td>
+                                        <td>{{ $user->doctor->license_no }}</td>
+                                        <td>
+                                            <form method="POST" action="{{ route('admin.doctors.verify', $user) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-success">Verify</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-center text-muted">No pending doctor verifications</p>
+                @endif
+            </div>
+        </div>
 
-            <!-- Pending Doctor Verifications -->
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-user-clock me-2"></i>Pending Verifications</h5>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Appointments</h5>
+            </div>
+            <div class="card-body">
+                @if($recentAppointments->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($recentAppointments as $appointment)
+                                    <tr>
+                                        <td>{{ $appointment->patient->first_name }} {{ $appointment->patient->last_name }}</td>
+                                        <td>Dr. {{ $appointment->doctor->user->name }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y H:i') }}</td>
+                                        <td>
+                                            <span
+                                                class="badge bg-{{ $appointment->appointment_status == 'scheduled' ? 'warning' : ($appointment->appointment_status == 'completed' ? 'success' : 'danger') }}">
+                                                {{ ucfirst($appointment->appointment_status) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="card-body">
-                        @if($pendingDoctors->count() > 0)
-                            @foreach($pendingDoctors as $user)
-                                <div class="verification-item border-bottom pb-3 mb-3">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h6 class="mb-1">{{ $user->name }}</h6>
-                                            <small class="text-muted">{{ $user->email }}</small>
-                                            <br><small class="text-muted">{{ $user->doctor->speciality }}</small>
-                                        </div>
-                                        <form action="{{ route('admin.doctors.verify', $user) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="fas fa-check me-1"></i>Verify
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="text-center py-3">
-                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                                <p class="text-muted mb-0">No pending verifications</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
+                @else
+                    <p class="text-center text-muted">No appointments found</p>
+                @endif
             </div>
         </div>
     </div>

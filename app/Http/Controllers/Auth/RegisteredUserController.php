@@ -24,9 +24,8 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        // Base validation rules
+        // Base validation rules (no full name field; we'll compose it)
         $rules = [
-            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:patient,doctor'],
@@ -56,8 +55,9 @@ class RegisteredUserController extends Controller
         try {
             DB::beginTransaction();
 
+            $composedName = trim($request->first_name.' '.$request->last_name);
             $user = User::create([
-                'name' => $request->name,
+                'name' => $composedName,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => $request->role,

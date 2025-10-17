@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
         <!-- Logo/Brand -->
-        <a class="navbar-brand" href="{{ route('dashboard') }}">
+        <a class="navbar-brand" href="{{ url('/') }}">
             <i class="fas fa-heartbeat me-2"></i>DocTime
         </a>
 

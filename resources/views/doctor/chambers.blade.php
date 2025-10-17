@@ -69,6 +69,11 @@
                                         <span>{{ implode(', ', $chamber->working_days) }}</span>
                                     </div>
 
+                                    <div class="d-flex align-items-center text-muted mb-2">
+                                        <i class="fas fa-money-bill-wave me-2"></i>
+                                        <span>Visiting Fee: {{ number_format($chamber->visiting_fee, 2) }}</span>
+                                    </div>
+
                                     @if($chamber->phone)
                                         <div class="d-flex align-items-center text-muted mb-3">
                                             <i class="fas fa-phone me-2"></i>
@@ -89,7 +94,7 @@
                                         <div class="col-6">
                                             <div class="stat-item">
                                                 <h6 class="mb-1 text-success">
-                                                    {{ $chamber->appointments->where('status', 'scheduled')->count() }}</h6>
+                                                    {{ $chamber->appointments->where('appointment_status', 'scheduled')->count() }}</h6>
                                                 <small class="text-muted">Scheduled</small>
                                             </div>
                                         </div>

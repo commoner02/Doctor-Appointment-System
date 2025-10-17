@@ -21,30 +21,32 @@
                         <div class="col-md-6">
                             <label class="form-label">First Name</label>
                             <input type="text" class="form-control @error('first_name') is-invalid @enderror"
-                                   name="first_name"
-                                   value="{{ old('first_name', $user->isPatient() ? $user->patient->first_name : ($user->isDoctor() ? $user->doctor->first_name : '')) }}"
-                                   required>
-                            @error('first_name')<span class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
+                                name="first_name"
+                                value="{{ old('first_name', $user->isPatient() ? $user->patient->first_name : ($user->isDoctor() ? $user->doctor->first_name : '')) }}"
+                                required>
+                            @error('first_name')<span
+                            class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Last Name</label>
                             <input type="text" class="form-control @error('last_name') is-invalid @enderror"
-                                   name="last_name"
-                                   value="{{ old('last_name', $user->isPatient() ? $user->patient->last_name : ($user->isDoctor() ? $user->doctor->last_name : '')) }}"
-                                   required>
-                            @error('last_name')<span class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
+                                name="last_name"
+                                value="{{ old('last_name', $user->isPatient() ? $user->patient->last_name : ($user->isDoctor() ? $user->doctor->last_name : '')) }}"
+                                required>
+                            @error('last_name')<span
+                            class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                   name="email" value="{{ old('email', $user->email) }}" required>
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
+                                value="{{ old('email', $user->email) }}" required>
                             @error('email')<span class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Phone</label>
-                            <input type="text" class="form-control @error('phone') is-invalid @enderror"
-                                   name="phone" value="{{ old('phone', $user->isPatient() ? $user->patient->phone : ($user->isDoctor() ? $user->doctor->phone : '')) }}"
-                                   required>
+                            <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone"
+                                value="{{ old('phone', $user->isPatient() ? $user->patient->phone : ($user->isDoctor() ? $user->doctor->phone : '')) }}"
+                                required>
                             @error('phone')<span class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
                         </div>
                     </div>
@@ -54,10 +56,10 @@
                     </div>
                 </form>
                 <script>
-                    document.getElementById('profile-form').addEventListener('submit', function() {
+                    document.getElementById('profile-form').addEventListener('submit', function () {
                         const form = this;
-                        const first = form.querySelector('input[name="first_name"]')?.value?.trim() || '';
-                        const last = form.querySelector('input[name="last_name"]')?.value?.trim() || '';
+                        const first = form.querySelector('input[name="first_name"]').value.trim();
+                        const last = form.querySelector('input[name="last_name"]').value.trim();
                         document.getElementById('name').value = [first, last].filter(Boolean).join(' ');
                     });
                 </script>

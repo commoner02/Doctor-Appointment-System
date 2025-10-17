@@ -58,8 +58,8 @@
                             </div>
 
                             <!-- Basic Information -->
-{{--                            
-                                <div class="col-md-6">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
                                     <label for="email" class="form-label">Email Address</label>
                                     <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
                                         name="email" value="{{ old('email') }}" required>
@@ -69,7 +69,7 @@
                                         </span>
                                     @enderror
                                 </div>
-                            </div> --}}
+                            </div>
 
                             <div class="row mb-3">
                                 <div class="col-md-6">

@@ -2,94 +2,52 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Doctor;
 use App\Models\Appointment;
-use App\Models\Chamber;
-use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
-    public function browse()
+    public function __construct()
     {
-        $doctors = Doctor::with(['user', 'chambers'])
-            ->whereHas('user', function($query) {
-                $query->where('is_verified', true);
-            })
-            ->get();
-        
-        return view('doctor.browse', compact('doctors'));
-    }
-
-    public function show(Doctor $doctor)
-    {
-        $doctor->load(['user', 'chambers']);
-        return view('doctor.show', compact('doctor'));
+        $this->middleware('auth');
     }
 
     public function dashboard()
     {
-        $user = auth()->user();
-        if (!$user->isDoctor() || !$user->is_verified) return redirect()->route('doctor.pending');
+        if (auth()->user()->role !== 'doctor') {
+            abort(403, 'Unauthorized access');
+        }
 
-        $doctor = $user->doctor;
-
-        $todayAppointments = Appointment::where('doctor_id', $doctor->id)
-            ->whereDate('appointment_date', Carbon::today())
-            ->where('appointment_status', 'scheduled')
-            ->with(['patient'])
-            ->get();
-
-        $totalAppointments = Appointment::where('doctor_id', $doctor->id)->count();
-
-        $upcomingAppointments = Appointment::where('doctor_id', $doctor->id)
-            ->where('status', 'scheduled')
-            ->where('appointment_date', '>=', now())
-            ->with(['patient', 'chamber'])
-            ->get();
-
-        return view('doctor.dashboard', compact('todayAppointments', 'totalAppointments', 'upcomingAppointments'));
-    }
-
-    public function appointments()
-    {
         $doctor = auth()->user()->doctor;
-        $appointments = Appointment::where('doctor_id', $doctor->id)
+        
+        // Get all appointments (scheduled, completed, cancelled)
+        $upcomingAppointments = Appointment::where('doctor_id', $doctor->id)
+            ->orderBy('appointment_date', 'desc')
             ->with(['patient', 'chamber'])
-            ->latest()
             ->get();
-
-        return view('doctor.appointments', compact('appointments'));
+        
+        $todayAppointments = Appointment::where('doctor_id', $doctor->id)
+            ->whereDate('appointment_date', today())
+            ->get();
+        
+        $totalAppointments = Appointment::where('doctor_id', $doctor->id)->count();
+        
+        $completedAppointments = Appointment::where('doctor_id', $doctor->id)
+            ->where('appointment_status', 'completed')
+            ->count();
+        
+        return view('doctor.dashboard', compact(
+            'upcomingAppointments',
+            'todayAppointments',
+            'totalAppointments',
+            'completedAppointments'
+        ));
     }
 
-    public function chambers()
+    public function show($id)
     {
-        $user = auth()->user();
-        
-        // Check if user is doctor and verified
-        if (!$user->isDoctor() || !$user->is_verified) {
-            abort(403, 'Unauthorized');
-        }
-        
-        $doctor = $user->doctor;
-        
-        $chambers = Chamber::where('doctor_id', $doctor->id)->get();
-
-        return view('doctor.chambers', compact('chambers'));
-    }
-
-    public function updateAppointmentStatus(Appointment $appointment)
-    {
-        $status = request('appointment_status');
-        if (!in_array($status, ['scheduled', 'completed', 'cancelled'])) {
-            return back()->withErrors(['appointment_status' => 'Invalid appointment status']);
-        }
-        $appointment->update(['appointment_status' => $status]);
-        return back()->with('success', 'Appointment status updated.');
-    }
-
-    public function pending()
-    {
-        return view('doctor.pending-verification');
+        $doctor = Doctor::with('user')->findOrFail($id);
+        return view('doctors.show', compact('doctor'));
     }
 }

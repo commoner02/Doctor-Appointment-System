@@ -91,7 +91,8 @@
                                                 </td>
                                                 <td>{{ $appointment->chamber->chamber_name }}</td>
                                                 <td>
-                                                    <span class="badge bg-warning">{{ ucfirst($appointment->status) }}</span>
+                                                    <span
+                                                        class="badge bg-warning">{{ ucfirst($appointment->appointment_status) }}</span>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -151,6 +152,56 @@
                             <i class="fas fa-apple-alt text-warning me-2"></i>
                             <small>Eat a balanced diet with fruits and vegetables</small>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Appointments -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">All Appointments</h5>
+                    </div>
+                    <div class="card-body">
+                        @if($appointments->count() > 0)
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Doctor</th>
+                                            <th>Date</th>
+                                            <th>Chamber</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($appointments as $appointment)
+                                            <tr>
+                                                <td>Dr. {{ $appointment->doctor->user->name }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y H:i') }}
+                                                </td>
+                                                <td>{{ $appointment->chamber->chamber_name }}</td>
+                                                <td>
+                                                    <span
+                                                        class="badge bg-{{ $appointment->appointment_status == 'scheduled' ? 'warning' : ($appointment->appointment_status == 'completed' ? 'success' : 'danger') }}">
+                                                        {{ ucfirst($appointment->appointment_status) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('appointments.show', $appointment) }}"
+                                                        class="btn btn-sm btn-info">View</a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <p class="text-center text-muted">No appointments found</p>
+                        @endif
                     </div>
                 </div>
             </div>

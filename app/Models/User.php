@@ -38,21 +38,23 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'registration_data' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 
     // Relationships
     public function doctor()
     {
-        return $this->hasOne(Doctor::class);
+        return $this->hasOne(\App\Models\Doctor::class);
     }
 
     public function patient()
     {
-        return $this->hasOne(Patient::class);
+        return $this->hasOne(\App\Models\Patient::class);
     }
 
     // Helper methods for role checking

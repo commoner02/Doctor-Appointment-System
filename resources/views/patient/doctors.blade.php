@@ -44,6 +44,7 @@
                                     <div class="small text-muted">{{ $ch->chamber_location }}</div>
                                     <div class="small">Time: {{ $ch->start_time }} - {{ $ch->end_time }}</div>
                                     <div class="small">Days: {{ implode(', ', $ch->working_days) }}</div>
+                                    <div class="small">Fee: {{ number_format($ch->visiting_fee, 2) }}</div>
                                 </div>
                             </div>
                         @empty

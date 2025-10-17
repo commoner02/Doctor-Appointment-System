@@ -2,7 +2,7 @@
 
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model; 
+use Illuminate\Database\Eloquent\Model;
 
 class Chamber extends Model
 {
@@ -21,7 +21,8 @@ class Chamber extends Model
 
     protected $casts = [
         'start_time' => 'datetime:H:i',
-        'end_time' => 'datetime:H:i'
+        'end_time' => 'datetime:H:i',
+        'visiting_fee' => 'decimal:2'
     ];
 
     // Relationships
@@ -35,15 +36,9 @@ class Chamber extends Model
         return $this->hasMany(Appointment::class);
     }
 
-    // Convert working_days to array when getting from database
-    public function getWorkingDaysAttribute($value)
+    // Helper to get working days as array
+    public function getWorkingDaysArray()
     {
-        return explode(',', $value);
-    }
-
-    // Convert working_days to string when saving to database
-    public function setWorkingDaysAttribute($value)
-    {
-        $this->attributes['working_days'] = is_array($value) ? implode(',', $value) : $value;
+        return explode(',', $this->working_days);
     }
 }

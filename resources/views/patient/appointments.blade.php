@@ -14,6 +14,7 @@
                                 <th>Date</th>
                                 <th>Chamber</th>
                                 <th>Status</th>
+                                <th>Payment</th>
                                 <th>Reason</th>
                             </tr>
                         </thead>
@@ -23,7 +24,8 @@
                                     <td>Dr. {{ $a->doctor->first_name }} {{ $a->doctor->last_name }}</td>
                                     <td>{{ $a->appointment_date->format('M d, Y H:i') }}</td>
                                     <td>{{ $a->chamber->chamber_name }}</td>
-                                    <td>{{ ucfirst($a->status) }}</td>
+                                    <td>{{ ucfirst($a->appointment_status) }}</td>
+                                    <td>{{ ucfirst($a->payment_status ?? 'unpaid') }}</td>
                                     <td>{{ $a->reason ?? '-' }}</td>
                                 </tr>
                             @empty

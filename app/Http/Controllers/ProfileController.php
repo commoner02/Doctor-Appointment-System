@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -18,7 +19,7 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         $user = $request->user();
-        
+
         // Load role-specific data
         if ($user->isPatient()) {
             $user->load('patient');
@@ -37,37 +38,53 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
-        $user->fill($request->validated());
 
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
 
-        $user->save();
+        $user->update($validated);
 
-        // Update role-specific information
-        if ($user->isPatient() && $user->patient) {
-            $user->patient->update([
-                'first_name' => $request->first_name ?? $user->patient->first_name,
-                'last_name' => $request->last_name ?? $user->patient->last_name,
-                'phone' => $request->phone ?? $user->patient->phone,
-                'gender' => $request->gender ?? $user->patient->gender,
-                'date_of_birth' => $request->date_of_birth ?? $user->patient->date_of_birth,
-                'blood_group' => $request->blood_group ?? $user->patient->blood_group,
-                'address' => $request->address ?? $user->patient->address,
-            ]);
-        } elseif ($user->isDoctor() && $user->doctor) {
+        // Update related profile (doctor or patient)
+        if ($user->isDoctor() && $user->doctor) {
+            $nameParts = explode(' ', $validated['name'], 2);
             $user->doctor->update([
-                'first_name' => $request->first_name ?? $user->doctor->first_name,
-                'last_name' => $request->last_name ?? $user->doctor->last_name,
-                'phone' => $request->phone ?? $user->doctor->phone,
-                'speciality' => $request->speciality ?? $user->doctor->speciality,
-                'license_no' => $request->license_no ?? $user->doctor->license_no,
-                'qualifications' => $request->qualifications ?? $user->doctor->qualifications,
+                'first_name' => $nameParts[0],
+                'last_name' => $nameParts[1] ?? ''
+            ]);
+        } elseif ($user->isPatient() && $user->patient) {
+            $nameParts = explode(' ', $validated['name'], 2);
+            $user->patient->update([
+                'first_name' => $nameParts[0],
+                'last_name' => $nameParts[1] ?? ''
             ]);
         }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Update the user's password.
+     */
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return back()->with('success', 'Password updated successfully!');
     }
 
     /**

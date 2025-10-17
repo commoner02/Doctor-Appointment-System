@@ -13,7 +13,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -27,17 +27,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/patient/dashboard', [PatientController::class, 'dashboard'])->name('patient.dashboard');
     Route::get('/patient/appointments', [PatientController::class, 'appointments'])->name('patient.appointments');
     Route::get('/patient/doctors', [PatientController::class, 'findDoctors'])->name('patient.doctors');
-    Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patients.show'); // NEW
+    Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
 
     // Doctor
     Route::get('/doctor/dashboard', [DoctorController::class, 'dashboard'])->name('doctor.dashboard');
     Route::get('/doctor/appointments', [DoctorController::class, 'appointments'])->name('doctor.appointments');
     Route::get('/doctor/chambers', [ChamberController::class, 'index'])->name('doctor.chambers');
     Route::get('/doctor/pending', [DoctorController::class, 'pending'])->name('doctor.pending');
-    Route::patch('/appointments/{appointment}/status', [DoctorController::class, 'updateAppointmentStatus'])->name('appointments.update-status');
 
-    // Doctors (public-facing show page for booking)
-    Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctor.show'); // NEW
+    // Doctors (public-facing)
+    Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctor.show');
 
     // Chambers
     Route::get('/chambers/create', [ChamberController::class, 'create'])->name('chambers.create');
@@ -53,5 +52,13 @@ Route::middleware(['auth'])->group(function () {
     // Appointments
     Route::get('/appointments/create/{doctor}', [AppointmentController::class, 'create'])->name('appointments.create');
     Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-    Route::get('/appointments/my', [AppointmentController::class, 'myAppointments'])->name('appointments.my');
+    Route::get('/appointments/{appointment}', [AppointmentController::class, 'show'])->name('appointments.show');
+    Route::get('/appointments/{appointment}/edit', [AppointmentController::class, 'edit'])->name('appointments.edit');
+    Route::put('/appointments/{appointment}', [AppointmentController::class, 'update'])->name('appointments.update');
+    Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
+    Route::delete('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
 });
+
+Route::get('/waiting', function () {
+    return view('guest.waiting');
+})->name('guest.waiting')->middleware('auth');
