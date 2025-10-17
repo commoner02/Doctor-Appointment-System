@@ -58,17 +58,7 @@
                             </div>
 
                             <!-- Basic Information -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="name" class="form-label">Full Name</label>
-                                    <input id="name" type="text" class="form-control @error('name') is-invalid @enderror"
-                                        name="name" value="{{ old('name') }}" required>
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
+{{--                            
                                 <div class="col-md-6">
                                     <label for="email" class="form-label">Email Address</label>
                                     <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
@@ -79,7 +69,7 @@
                                         </span>
                                     @enderror
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="row mb-3">
                                 <div class="col-md-6">

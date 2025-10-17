@@ -14,8 +14,10 @@ return new class extends Migration
             $table->foreignId('doctor_id')->constrained();
             $table->foreignId('chamber_id')->constrained();
             $table->dateTime('appointment_date');
-            $table->enum('status', ['scheduled', 'completed', 'cancelled'])->default('scheduled');
+            $table->enum('appointment_status', ['scheduled', 'completed', 'cancelled'])->default('scheduled');
+            $table->enum('payment_status',['paid','unpaid']);
             $table->text('reason')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

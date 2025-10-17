@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('phone', 20)->nullable();
             $table->time('start_time');
             $table->time('end_time');
+            $table->decimal('visiting_fee', 10, 2);
             $table->set('working_days', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']);
             $table->timestamps();
         });

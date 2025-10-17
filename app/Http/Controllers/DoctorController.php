@@ -30,22 +30,18 @@ class DoctorController extends Controller
     public function dashboard()
     {
         $user = auth()->user();
-        
-        // Check if user is doctor and verified
-        if (!$user->isDoctor() || !$user->is_verified) {
-            abort(403, 'Unauthorized');
-        }
-        
+        if (!$user->isDoctor() || !$user->is_verified) return redirect()->route('doctor.pending');
+
         $doctor = $user->doctor;
-        
-        $today = Carbon::today();
+
         $todayAppointments = Appointment::where('doctor_id', $doctor->id)
-            ->whereDate('appointment_date', $today)
-            ->where('status', 'scheduled')
+            ->whereDate('appointment_date', Carbon::today())
+            ->where('appointment_status', 'scheduled')
+            ->with(['patient'])
             ->get();
-            
+
         $totalAppointments = Appointment::where('doctor_id', $doctor->id)->count();
-        
+
         $upcomingAppointments = Appointment::where('doctor_id', $doctor->id)
             ->where('status', 'scheduled')
             ->where('appointment_date', '>=', now())
@@ -57,15 +53,7 @@ class DoctorController extends Controller
 
     public function appointments()
     {
-        $user = auth()->user();
-        
-        // Check if user is doctor and verified
-        if (!$user->isDoctor() || !$user->is_verified) {
-            abort(403, 'Unauthorized');
-        }
-        
-        $doctor = $user->doctor;
-        
+        $doctor = auth()->user()->doctor;
         $appointments = Appointment::where('doctor_id', $doctor->id)
             ->with(['patient', 'chamber'])
             ->latest()
@@ -90,17 +78,14 @@ class DoctorController extends Controller
         return view('doctor.chambers', compact('chambers'));
     }
 
-    public function updateAppointmentStatus(Appointment $appointment, Request $request)
+    public function updateAppointmentStatus(Appointment $appointment)
     {
-        $user = auth()->user();
-        
-        // Check if user is doctor and verified
-        if (!$user->isDoctor() || !$user->is_verified) {
-            abort(403, 'Unauthorized');
+        $status = request('appointment_status');
+        if (!in_array($status, ['scheduled', 'completed', 'cancelled'])) {
+            return back()->withErrors(['appointment_status' => 'Invalid appointment status']);
         }
-        
-        $appointment->update(['status' => $request->status]);
-        return redirect()->back()->with('success', 'Appointment status updated!');
+        $appointment->update(['appointment_status' => $status]);
+        return back()->with('success', 'Appointment status updated.');
     }
 
     public function pending()

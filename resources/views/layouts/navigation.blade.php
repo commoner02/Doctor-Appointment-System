@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <!-- Logo/Brand -->
         <a class="navbar-brand" href="{{ route('dashboard') }}">
-            <i class="fas fa-heartbeat me-2"></i>HealthCare+
+            <i class="fas fa-heartbeat me-2"></i>DocTime
         </a>
 
         <!-- Mobile Toggle Button -->

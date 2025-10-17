@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\Doctor;
-use App\Models\Chamber;
 
 class AppointmentController extends Controller
 {
@@ -21,25 +20,23 @@ class AppointmentController extends Controller
             'doctor_id' => 'required|exists:doctors,id',
             'chamber_id' => 'required|exists:chambers,id',
             'appointment_date' => 'required|date',
-            'reason' => 'required|string|max:255',
+            'reason' => 'nullable|string|max:255',
         ]);
 
-        // Get patient ID from logged in user
         $patientId = auth()->user()->patient->id;
 
-        $appointment = Appointment::create([
+        Appointment::create([
             'patient_id' => $patientId,
             'doctor_id' => $request->doctor_id,
             'chamber_id' => $request->chamber_id,
             'appointment_date' => $request->appointment_date,
+            'appointment_status' => 'scheduled',
+            'payment_status' => 'unpaid',
             'reason' => $request->reason,
-            'status' => 'scheduled',
         ]);
 
-        return redirect()->route('patient.dashboard')
-            ->with('success', 'Appointment booked successfully!');
+        return redirect()->route('patient.appointments')->with('success', 'Appointment booked.');
     }
-
     public function myAppointments()
     {
         $appointments = Appointment::with(['doctor', 'chamber'])

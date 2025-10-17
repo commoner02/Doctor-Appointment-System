@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Chamber;
+use App\Models\Appointment;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,35 +19,73 @@ class DatabaseSeeder extends Seeder
     {
         // Admin User (verified by default)
         User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@hospital.com',
+            'name' => 'Admin',
+            'email' => 'admin@hospital.bd',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'is_verified' => true
         ]);
 
-        // Doctor seeding
+        // Doctor seeding (Bangladesh)
         $doctors = [
             [
-                'email' => 'dr.johnsmith@hospital.com',
-                'first_name' => 'John',
-                'last_name' => 'Smith',
+                'email' => 'dr.mrahman@hospital.bd',
+                'first_name' => 'Mohammad',
+                'last_name' => 'Rahman',
                 'speciality' => 'Cardiologist',
-                'phone' => '+1-555-0101',
-                'license_no' => 'MD12345678',
-                'qualifications' => 'MBBS, MD (Cardiology)'
+                'phone' => '+8801712345678',
+                'license_no' => 'BMDC-654321',
+                'qualifications' => 'MBBS, FCPS (Cardiology)',
+                'chamber' => [
+                    'name' => 'Dhanmondi Heart Clinic',
+                    'location' => 'House 12, Road 5, Dhanmondi, Dhaka',
+                    'phone' => '+8801712345678',
+                    'start_time' => '10:00:00',
+                    'end_time' => '18:00:00',
+                    'visiting_fee' => 1000.00,
+                    // MySQL SET accepts comma-separated values
+                    'working_days' => 'Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday'
+                ]
             ],
             [
-                'email' => 'dr.janedoe@hospital.com',
-                'first_name' => 'Jane',
-                'last_name' => 'Doe',
+                'email' => 'dr.aakter@hospital.bd',
+                'first_name' => 'Ayesha',
+                'last_name' => 'Akter',
                 'speciality' => 'Neurologist',
-                'phone' => '+1-555-0102',
-                'license_no' => 'MD87654321',
-                'qualifications' => 'MBBS, MD (Neurology)'
+                'phone' => '+8801811223344',
+                'license_no' => 'BMDC-789012',
+                'qualifications' => 'MBBS, MD (Neurology)',
+                'chamber' => [
+                    'name' => 'Chattogram Neuro Care',
+                    'location' => 'Agrabad Access Rd, Chattogram',
+                    'phone' => '+8801811223344',
+                    'start_time' => '16:00:00',
+                    'end_time' => '21:00:00',
+                    'visiting_fee' => 800.00,
+                    'working_days' => 'Saturday,Sunday,Monday,Tuesday,Wednesday'
+                ]
+            ],
+            [
+                'email' => 'dr.khossain@hospital.bd',
+                'first_name' => 'Kamal',
+                'last_name' => 'Hossain',
+                'speciality' => 'Dermatologist',
+                'phone' => '+8801911556677',
+                'license_no' => 'BMDC-112233',
+                'qualifications' => 'MBBS, DDV',
+                'chamber' => [
+                    'name' => 'Sylhet Skin Center',
+                    'location' => 'Zindabazar, Sylhet',
+                    'phone' => '+8801911556677',
+                    'start_time' => '09:30:00',
+                    'end_time' => '14:30:00',
+                    'visiting_fee' => 700.00,
+                    'working_days' => 'Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday'
+                ]
             ]
         ];
 
+        $createdDoctors = [];
         foreach ($doctors as $doc) {
             $user = User::create([
                 'name' => $doc['first_name'] . ' ' . $doc['last_name'],
@@ -66,42 +105,56 @@ class DatabaseSeeder extends Seeder
                 'qualifications' => $doc['qualifications']
             ]);
 
-            // Create chambers for doctors - working_days as comma-separated string
-            Chamber::create([
+            $chamber = Chamber::create([
                 'doctor_id' => $doctor->id,
-                'chamber_name' => 'Main Chamber',
-                'chamber_location' => 'Hospital Building A, Floor 2',
-                'phone' => $doc['phone'],
-                'start_time' => '09:00:00',
-                'end_time' => '17:00:00',
-                'working_days' => 'Monday,Tuesday,Wednesday,Thursday,Friday'
+                'chamber_name' => $doc['chamber']['name'],
+                'chamber_location' => $doc['chamber']['location'],
+                'phone' => $doc['chamber']['phone'],
+                'start_time' => $doc['chamber']['start_time'],
+                'end_time' => $doc['chamber']['end_time'],
+                'visiting_fee' => $doc['chamber']['visiting_fee'],
+                // For MySQL SET, a comma-separated string is fine
+                'working_days' => $doc['chamber']['working_days'],
             ]);
+
+            $createdDoctors[] = ['doctor' => $doctor, 'chamber' => $chamber];
         }
 
-        // Patient seeding (always verified)
+        // Patient seeding (Bangladesh, always verified)
         $patients = [
             [
-                'email' => 'patient1@example.com',
-                'first_name' => 'John',
-                'last_name' => 'Doe',
+                'email' => 'sabbir.ahmed@example.bd',
+                'first_name' => 'Sabbir',
+                'last_name' => 'Ahmed',
                 'gender' => 'Male',
-                'phone' => '1234567890',
-                'date_of_birth' => '1990-01-15',
+                'phone' => '+8801799001122',
+                'date_of_birth' => '1992-03-11',
                 'blood_group' => 'A+',
-                'address' => '123 Main St, City, State'
+                'address' => 'Dhanmondi, Dhaka'
             ],
             [
-                'email' => 'patient2@example.com',
-                'first_name' => 'Jane',
-                'last_name' => 'Smith',
+                'email' => 'nusrat.jahan@example.bd',
+                'first_name' => 'Nusrat',
+                'last_name' => 'Jahan',
                 'gender' => 'Female',
-                'phone' => '0987654321',
-                'date_of_birth' => '1985-05-20',
+                'phone' => '+8801677003344',
+                'date_of_birth' => '1988-07-25',
+                'blood_group' => 'O+',
+                'address' => 'Agrabad, Chattogram'
+            ],
+            [
+                'email' => 'mahmudul.hasan@example.bd',
+                'first_name' => 'Mahmudul',
+                'last_name' => 'Hasan',
+                'gender' => 'Male',
+                'phone' => '+8801300556677',
+                'date_of_birth' => '1995-12-05',
                 'blood_group' => 'B+',
-                'address' => '456 Oak Ave, City, State'
+                'address' => 'Zindabazar, Sylhet'
             ]
         ];
 
+        $createdPatients = [];
         foreach ($patients as $pat) {
             $user = User::create([
                 'name' => $pat['first_name'] . ' ' . $pat['last_name'],
@@ -111,7 +164,7 @@ class DatabaseSeeder extends Seeder
                 'is_verified' => true
             ]);
 
-            Patient::create([
+            $patient = Patient::create([
                 'user_id' => $user->id,
                 'first_name' => $pat['first_name'],
                 'last_name' => $pat['last_name'],
@@ -121,6 +174,62 @@ class DatabaseSeeder extends Seeder
                 'blood_group' => $pat['blood_group'],
                 'address' => $pat['address']
             ]);
+
+            $createdPatients[] = $patient;
+        }
+
+        // Sample appointments (dates aligned to working hours)
+        if (!empty($createdDoctors) && !empty($createdPatients)) {
+            Appointment::create([
+                'patient_id' => $createdPatients[0]->id,
+                'doctor_id' => $createdDoctors[0]['doctor']->id,
+                'chamber_id' => $createdDoctors[0]['chamber']->id,
+                'appointment_date' => '2025-10-20 10:30:00',
+                'appointment_status' => 'scheduled',
+                'payment_status' => 'unpaid',
+                'reason' => 'Chest discomfort and shortness of breath',
+                'notes' => 'First-time visit'
+            ]);
+
+            Appointment::create([
+                'patient_id' => $createdPatients[1]->id,
+                'doctor_id' => $createdDoctors[1]['doctor']->id,
+                'chamber_id' => $createdDoctors[1]['chamber']->id,
+                'appointment_date' => '2025-10-21 19:00:00',
+                'appointment_status' => 'scheduled',
+                'payment_status' => 'paid',
+                'reason' => 'Frequent headaches and dizziness',
+                'notes' => 'Carry previous MRI reports'
+            ]);
+
+            Appointment::create([
+                'patient_id' => $createdPatients[2]->id,
+                'doctor_id' => $createdDoctors[2]['doctor']->id,
+                'chamber_id' => $createdDoctors[2]['chamber']->id,
+                'appointment_date' => '2025-10-18 11:15:00',
+                'appointment_status' => 'completed',
+                'payment_status' => 'paid',
+                'reason' => 'Skin rash and itching',   //this is to fill by patient..
+                'notes' => 'Prescribed topical ointment' //this is to fillable by doctor..
+            ]);
         }
     }
 }
+
+
+/**
+ * Database Seeder - Test Credentials
+ * 
+ * Admin:
+ * - Email: admin@hospital.bd | Password: password
+ * 
+ * Doctors:
+ * - Email: dr.mrahman@hospital.bd | Password: password (Cardiologist)
+ * - Email: dr.aakter@hospital.bd | Password: password (Neurologist)
+ * - Email: dr.khossain@hospital.bd | Password: password (Dermatologist)
+ * 
+ * Patients:
+ * - Email: sabbir.ahmed@example.bd | Password: password
+ * - Email: nusrat.jahan@example.bd | Password: password
+ * - Email: mahmudul.hasan@example.bd | Password: password
+ */
