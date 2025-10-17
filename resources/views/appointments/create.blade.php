@@ -4,45 +4,36 @@
 
 @section('content')
     <div class="container">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">Book Appointment</div>
-                    <div class="card-body">
-                        <h5>Dr. {{ $doctor->first_name }} {{ $doctor->last_name }}</h5>
-                        <p><strong>Speciality:</strong> {{ $doctor->speciality }}</p>
-                        <p><strong>Phone:</strong> {{ $doctor->phone }}</p>
+        <div class="card">
+            <div class="card-body">
+                <h5>Dr. {{ $doctor->first_name }} {{ $doctor->last_name }} <span class="text-muted">•
+                        {{ $doctor->speciality }}</span></h5>
+                <form method="POST" action="{{ route('appointments.store') }}" class="mt-3">
+                    @csrf
+                    <input type="hidden" name="doctor_id" value="{{ $doctor->id }}">
 
-                        <form method="POST" action="{{ route('appointments.store') }}">
-                            @csrf
-                            <input type="hidden" name="doctor_id" value="{{ $doctor->id }}">
-
-                            <div class="mb-3">
-                                <label for="chamber_id" class="form-label">Select Chamber</label>
-                                <select name="chamber_id" id="chamber_id" class="form-control" required>
-                                    <option value="">Select Chamber</option>
-                                    @foreach($doctor->chambers as $chamber)
-                                        <option value="{{ $chamber->id }}">{{ $chamber->chamber_name }} -
-                                            {{ $chamber->chamber_location }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="appointment_date" class="form-label">Appointment Date & Time</label>
-                                <input type="datetime-local" name="appointment_date" id="appointment_date"
-                                    class="form-control" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="reason" class="form-label">Reason for Visit</label>
-                                <textarea name="reason" id="reason" class="form-control" rows="3" required></textarea>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">Book Appointment</button>
-                        </form>
+                    <div class="mb-2">
+                        <label class="form-label">Chamber</label>
+                        <select name="chamber_id" class="form-control" required>
+                            <option value="">Select chamber</option>
+                            @foreach($doctor->chambers as $ch)
+                                <option value="{{ $ch->id }}">{{ $ch->chamber_name }} — {{ $ch->chamber_location }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                </div>
+
+                    <div class="mb-2">
+                        <label class="form-label">Date & Time</label>
+                        <input type="datetime-local" name="appointment_date" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Reason (optional)</label>
+                        <input type="text" name="reason" class="form-control" placeholder="Reason">
+                    </div>
+
+                    <button class="btn btn-primary">Book</button>
+                </form>
             </div>
         </div>
     </div>

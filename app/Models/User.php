@@ -82,11 +82,11 @@ class User extends Authenticatable
         if ($this->isAdmin() || $this->isPatient()) {
             return true;
         }
-        
+
         if ($this->isDoctor()) {
             return $this->is_verified;
         }
-        
+
         return false;
     }
 }

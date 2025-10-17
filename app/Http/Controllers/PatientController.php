@@ -96,4 +96,16 @@ class PatientController extends Controller
 
         return view('patient.appointments', compact('appointments'));
     }
+
+    public function show(\App\Models\Patient $patient)
+    {
+        $user = auth()->user();
+        // Allow patient themselves or any doctor to view a patient's basic profile
+        if (!($user->isDoctor() || ($user->isPatient() && $user->patient && $user->patient->id === $patient->id))) {
+            abort(403, 'Unauthorized');
+        }
+
+        $patient->load('user');
+        return view('patient.show', compact('patient'));
+    }
 }

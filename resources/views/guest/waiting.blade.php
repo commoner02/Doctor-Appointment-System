@@ -1,4 +1,6 @@
+
 @extends('layouts.app')
+@section('title', 'Account Pending Verification')
 
 @section('content')
     <div class="container">

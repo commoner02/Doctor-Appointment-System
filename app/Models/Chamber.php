@@ -15,6 +15,7 @@ class Chamber extends Model
         'phone',
         'start_time',
         'end_time',
+        'visiting_fee',
         'working_days'
     ];
 
