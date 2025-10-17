@@ -1,100 +1,61 @@
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-        <!-- Logo/Brand -->
-        <a class="navbar-brand" href="{{ route('dashboard') }}">
-            <i class="fas fa-heartbeat me-2"></i>DocTime
-        </a>
-
+<nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <div class="container">
         <!-- Mobile Toggle Button -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <!-- Navigation Links -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul class="navbar-nav">
                 @auth
                     @if(auth()->user()->isPatient())
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('patient.doctors') ? 'active' : '' }}"
-                                href="{{ route('patient.doctors') }}">
-                                <i class="fas fa-user-md me-1"></i>Find Doctors
-                            </a>
+                            <a class="nav-link" href="{{ route('patient.dashboard') }}">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('patient.appointments') ? 'active' : '' }}"
-                                href="{{ route('patient.appointments') }}">
-                                <i class="fas fa-calendar-check me-1"></i>My Appointments
-                            </a>
+                            <a class="nav-link" href="{{ route('doctor.browse') }}">Find Doctors</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('patient.appointments') }}">My Appointments</a>
                         </li>
                     @endif
 
                     @if(auth()->user()->isDoctor())
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('doctor.appointments') ? 'active' : '' }}"
-                                href="{{ route('doctor.appointments') }}">
-                                <i class="fas fa-calendar-alt me-1"></i>Appointments
-                            </a>
+                            <a class="nav-link" href="{{ route('doctor.dashboard') }}">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('doctor.chambers') ? 'active' : '' }}"
-                                href="{{ route('doctor.chambers') }}">
-                                <i class="fas fa-building me-1"></i>Chambers
-                            </a>
+                            <a class="nav-link" href="{{ route('doctor.appointments') }}">Appointments</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('doctor.chambers') }}">Chambers</a>
                         </li>
                     @endif
 
                     @if(auth()->user()->isAdmin())
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                                href="{{ route('admin.dashboard') }}">
-                                <i class="fas fa-cog me-1"></i>Admin Panel
-                            </a>
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.patients') }}">Patients</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.doctors') }}">Doctors</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.appointments') }}">Appointments</a>
                         </li>
                     @endif
-                @endauth
-            </ul>
-
-            <!-- User Menu -->
-            <ul class="navbar-nav">
-                @auth
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
-                            role="button" data-bs-toggle="dropdown">
-                            <div class="avatar-circle me-2">
-                                {{ substr(auth()->user()->name, 0, 1) }}
-                            </div>
-                            {{ auth()->user()->name }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                    <i class="fas fa-user me-2"></i>Profile
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
                 @else
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">
-                            <i class="fas fa-sign-in-alt me-1"></i>Login
-                        </a>
+                        <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">
-                            <i class="fas fa-user-plus me-1"></i>Register
-                        </a>
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
                     </li>
                 @endauth
             </ul>
@@ -103,37 +64,48 @@
 </nav>
 
 <style>
-    .avatar-circle {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        display: flex;
+    .navbar {
+        padding: 12px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .navbar-nav {
         align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 0.875rem;
+        gap: 15px;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        color: #666 !important;
+        padding: 8px 16px !important;
+        border-radius: 4px;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+        background-color: #20B2AA;
+        color: white !important;
     }
 
     .nav-link.active {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
+        background-color: #20B2AA;
+        color: white !important;
     }
 
-    .dropdown-menu {
-        border: none;
-        box-shadow: var(--card-shadow-lg);
-        border-radius: 12px;
-        padding: 0.5rem;
-    }
+    /* Mobile responsive */
+    @media (max-width: 991.98px) {
+        .navbar-nav {
+            text-align: center;
+            margin-top: 15px;
+            gap: 8px;
+        }
 
-    .dropdown-item {
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .dropdown-item:hover {
-        background-color: #f8fafc;
+        .nav-link {
+            margin: 3px 0;
+            padding: 6px 12px !important;
+            font-size: 13px;
+        }
     }
 </style>

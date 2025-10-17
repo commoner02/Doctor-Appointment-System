@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+
 use App\Models\User;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
@@ -41,6 +41,7 @@ class DoctorApprovalController extends Controller
         // TODOs: Send approval email to doctor
 
         return back()->with('success', 'Doctor approved successfully!');
+        
     }
 
     public function rejectDoctor(User $user)

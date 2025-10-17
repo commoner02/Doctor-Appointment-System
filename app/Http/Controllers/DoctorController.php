@@ -13,11 +13,11 @@ class DoctorController extends Controller
     public function browse()
     {
         $doctors = Doctor::with(['user', 'chambers'])
-            ->whereHas('user', function($query) {
+            ->whereHas('user', function ($query) {
                 $query->where('is_verified', true);
             })
             ->get();
-        
+
         return view('doctor.browse', compact('doctors'));
     }
 
@@ -30,7 +30,8 @@ class DoctorController extends Controller
     public function dashboard()
     {
         $user = auth()->user();
-        if (!$user->isDoctor() || !$user->is_verified) return redirect()->route('doctor.pending');
+        if (!$user->isDoctor() || !$user->is_verified)
+            return redirect()->route('doctor.pending');
 
         $doctor = $user->doctor;
 
@@ -42,10 +43,12 @@ class DoctorController extends Controller
 
         $totalAppointments = Appointment::where('doctor_id', $doctor->id)->count();
 
+        // Fixed: Changed 'status' to 'appointment_status'
         $upcomingAppointments = Appointment::where('doctor_id', $doctor->id)
-            ->where('status', 'scheduled')
+            ->where('appointment_status', 'scheduled')
             ->where('appointment_date', '>=', now())
             ->with(['patient', 'chamber'])
+            ->orderBy('appointment_date', 'asc')
             ->get();
 
         return view('doctor.dashboard', compact('todayAppointments', 'totalAppointments', 'upcomingAppointments'));
@@ -56,7 +59,7 @@ class DoctorController extends Controller
         $doctor = auth()->user()->doctor;
         $appointments = Appointment::where('doctor_id', $doctor->id)
             ->with(['patient', 'chamber'])
-            ->latest()
+            ->orderBy('appointment_date', 'desc')
             ->get();
 
         return view('doctor.appointments', compact('appointments'));
@@ -65,14 +68,14 @@ class DoctorController extends Controller
     public function chambers()
     {
         $user = auth()->user();
-        
+
         // Check if user is doctor and verified
         if (!$user->isDoctor() || !$user->is_verified) {
             abort(403, 'Unauthorized');
         }
-        
+
         $doctor = $user->doctor;
-        
+
         $chambers = Chamber::where('doctor_id', $doctor->id)->get();
 
         return view('doctor.chambers', compact('chambers'));

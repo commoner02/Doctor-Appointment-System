@@ -21,7 +21,7 @@ class PatientController extends Controller
         $patient = $user->patient;
         
         $upcomingAppointments = Appointment::where('patient_id', $patient->id)
-            ->where('status', 'scheduled')
+            ->where('appointment_status', 'scheduled')
             ->with(['doctor', 'chamber'])
             ->get();
 

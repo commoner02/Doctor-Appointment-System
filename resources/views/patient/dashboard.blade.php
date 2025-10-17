@@ -3,157 +3,402 @@
 @section('title', 'Patient Dashboard')
 
 @section('content')
-    <div class="container-fluid">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Welcome back, {{ auth()->user()->name }}!</h1>
-            <p class="page-subtitle">Manage your health appointments and find the best doctors</p>
+    <div class="patient-dashboard">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1>Welcome, {{ auth()->user()->name }}!</h1>
+            <p>Manage your health appointments</p>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">{{ $upcomingAppointments->count() }}</h3>
-                            <p class="mb-0 opacity-75">Upcoming Appointments</p>
-                        </div>
-                        <i class="fas fa-calendar-check fa-2x opacity-75"></i>
-                    </div>
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ $upcomingAppointments->count() }}</h3>
+                    <span>Upcoming</span>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stats-card success">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">{{ auth()->user()->patient->appointments->count() }}</h3>
-                            <p class="mb-0 opacity-75">Total Appointments</p>
-                        </div>
-                        <i class="fas fa-history fa-2x opacity-75"></i>
-                    </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ auth()->user()->patient->appointments->count() }}</h3>
+                    <span>Total Appointments</span>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stats-card info">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">Active</h3>
-                            <p class="mb-0 opacity-75">Profile Status</p>
-                        </div>
-                        <i class="fas fa-user-check fa-2x opacity-75"></i>
-                    </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Active</h3>
+                    <span>Profile Status</span>
                 </div>
             </div>
         </div>
 
-        <div class="row">
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="{{ route('patient.doctors') }}" class="action-btn primary">
+                <i class="fas fa-search"></i>
+                Find Doctors
+            </a>
+            <a href="{{ route('patient.appointments') }}" class="action-btn secondary">
+                <i class="fas fa-list"></i>
+                My Appointments
+            </a>
+            <a href="{{ route('profile.edit') }}" class="action-btn secondary">
+                <i class="fas fa-user-edit"></i>
+                Edit Profile
+            </a>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
             <!-- Upcoming Appointments -->
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Appointments</h5>
-                        <a href="{{ route('patient.appointments') }}" class="btn btn-sm btn-outline-primary">View All</a>
-                    </div>
-                    <div class="card-body">
-                        @if($upcomingAppointments->count() > 0)
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Doctor</th>
-                                            <th>Date & Time</th>
-                                            <th>Location</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($upcomingAppointments as $appointment)
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar-circle me-3"
-                                                            style="width: 40px; height: 40px; background: #e0e7ff; color: #3730a3;">
-                                                            {{ substr($appointment->doctor->first_name, 0, 1) }}
-                                                        </div>
-                                                        <div>
-                                                            <strong>Dr. {{ $appointment->doctor->first_name }}
-                                                                {{ $appointment->doctor->last_name }}</strong>
-                                                            <br><small
-                                                                class="text-muted">{{ $appointment->doctor->speciality }}</small>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <strong>{{ $appointment->appointment_date->format('M d, Y') }}</strong>
-                                                    <br><small
-                                                        class="text-muted">{{ $appointment->appointment_date->format('h:i A') }}</small>
-                                                </td>
-                                                <td>{{ $appointment->chamber->chamber_name }}</td>
-                                                <td>
-                                                    <span class="badge bg-warning">{{ ucfirst($appointment->status) }}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+            <div class="content-card">
+                <h5>Upcoming Appointments</h5>
+                <div class="card-content">
+                    @if($upcomingAppointments->count() > 0)
+                        @foreach($upcomingAppointments as $appointment)
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <strong>Dr. {{ $appointment->doctor->first_name }}
+                                        {{ $appointment->doctor->last_name }}</strong>
+                                    <div class="appointment-meta">
+                                        {{ $appointment->doctor->speciality }} •
+                                        {{ $appointment->appointment_date->format('M d, Y H:i') }}
+                                    </div>
+                                    <small>{{ $appointment->chamber->chamber_name }}</small>
+                                </div>
+                                <div class="appointment-status">
+                                    <span class="badge status-{{ $appointment->appointment_status }}">
+                                        {{ ucfirst($appointment->appointment_status) }}
+                                    </span>
+                                </div>
                             </div>
-                        @else
-                            <div class="text-center py-5">
-                                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No upcoming appointments</h5>
-                                <p class="text-muted">Book your first appointment to get started</p>
-                                <a href="{{ route('patient.doctors') }}" class="btn btn-primary">Find Doctors</a>
-                            </div>
-                        @endif
-                    </div>
+                        @endforeach
+                    @else
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-times"></i>
+                            <h6>No upcoming appointments</h6>
+                            <p>Book your first appointment</p>
+                            <a href="{{ route('patient.doctors') }}" class="btn-find">Find Doctors</a>
+                        </div>
+                    @endif
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            <!-- Health Tips -->
+            <div class="content-card">
+                <h5>Health Tips</h5>
+                <div class="card-content">
+                    <div class="health-tip">
+                        <i class="fas fa-heart"></i>
+                        <span>Regular check-ups prevent health issues</span>
                     </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-3">
-                            <a href="{{ route('patient.doctors') }}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-search me-2"></i>Find Doctors
-                            </a>
-                            <a href="{{ route('patient.appointments') }}" class="btn btn-outline-primary btn-lg">
-                                <i class="fas fa-list me-2"></i>View All Appointments
-                            </a>
-                            <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary btn-lg">
-                                <i class="fas fa-user-edit me-2"></i>Edit Profile
-                            </a>
-                        </div>
+                    <div class="health-tip">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>Exercise 30 minutes daily</span>
                     </div>
-                </div>
-
-                <!-- Health Tips -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Health Tips</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="health-tip">
-                            <i class="fas fa-heart text-danger me-2"></i>
-                            <small>Regular check-ups help prevent health issues</small>
-                        </div>
-                        <hr class="my-3">
-                        <div class="health-tip">
-                            <i class="fas fa-dumbbell text-success me-2"></i>
-                            <small>Stay active with 30 minutes of exercise daily</small>
-                        </div>
-                        <hr class="my-3">
-                        <div class="health-tip">
-                            <i class="fas fa-apple-alt text-warning me-2"></i>
-                            <small>Eat a balanced diet with fruits and vegetables</small>
-                        </div>
+                    <div class="health-tip">
+                        <i class="fas fa-apple-alt"></i>
+                        <span>Eat balanced diet with fruits</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .patient-dashboard {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #20B2AA;
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #20B2AA;
+            margin: 0 0 5px 0;
+        }
+
+        .dashboard-header p {
+            color: #666;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: border-color 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #20B2AA;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            background: #20B2AA;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .stat-info h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 3px 0;
+        }
+
+        .stat-info span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .action-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn.primary {
+            background: #20B2AA;
+            color: white;
+            border-color: #20B2AA;
+        }
+
+        .action-btn.primary:hover {
+            background: #178A84;
+            border-color: #178A84;
+            color: white;
+            text-decoration: none;
+        }
+
+        .action-btn.secondary:hover {
+            border-color: #20B2AA;
+            color: #20B2AA;
+            text-decoration: none;
+        }
+
+        .action-btn i {
+            font-size: 20px;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .content-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .content-card h5 {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            background: #20B2AA;
+            margin: 0;
+            padding: 14px 18px;
+        }
+
+        .card-content {
+            padding: 18px;
+        }
+
+        /* Appointment Items */
+        .appointment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .appointment-item:last-child {
+            border-bottom: none;
+        }
+
+        .appointment-info strong {
+            display: block;
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .appointment-meta {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .appointment-info small {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-scheduled {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #E6F7F6;
+            color: #178A84;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 36px;
+            margin-bottom: 12px;
+            color: #20B2AA;
+            opacity: 0.5;
+        }
+
+        .empty-state h6 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .btn-find {
+            background: #20B2AA;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .btn-find:hover {
+            background: #178A84;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Health Tips */
+        .health-tip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .health-tip:last-child {
+            border-bottom: none;
+        }
+
+        .health-tip i {
+            color: #20B2AA;
+            font-size: 16px;
+            width: 20px;
+        }
+
+        .health-tip span {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .patient-dashboard {
+                padding: 15px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
 @endsection

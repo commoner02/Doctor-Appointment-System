@@ -1,329 +1,297 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'HealthCare+') }}</title>
-    
+    <title>{{ config('app.name', 'DocTime') }}</title>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <style>
         :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --light: #f8fafc;
-            --dark: #2d3748;
-            --muted: #718096;
+            --primary: #20B2AA;
+            --primary-dark: #178A84;
+            --primary-light: #4DCBC2;
+            --primary-bg: #E6F7F6;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--light);
+            background: #f8f9fa;
         }
 
+        /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            min-height: 60vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
+            background: var(--primary);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 40%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: rotate(15deg);
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .logo {
-            width: 60px;
-            height: 60px;
+        .hero-logo {
+            width: 80px;
+            height: 80px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            backdrop-filter: blur(10px);
+            margin: 0 auto 20px;
         }
 
-        .logo i {
-            font-size: 2rem;
+        .hero-logo i {
+            font-size: 36px;
             color: white;
         }
 
         .hero-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 1rem;
+            font-size: 48px;
+            font-weight: 600;
+            margin-bottom: 15px;
         }
 
         .hero-subtitle {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 2rem;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
         }
 
-        .cta-buttons {
+        .hero-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .btn-hero {
-            padding: 0.75rem 2rem;
-            border-radius: 25px;
-            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 500;
             text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            transition: all 0.2s ease;
+            font-size: 16px;
         }
 
-        .btn-primary-hero {
+        .btn-hero-primary {
             background: white;
             color: var(--primary);
             border: 2px solid white;
         }
 
-        .btn-primary-hero:hover {
+        .btn-hero-primary:hover {
             background: transparent;
             color: white;
-            transform: translateY(-2px);
+            text-decoration: none;
         }
 
-        .btn-outline-hero {
+        .btn-hero-secondary {
             background: transparent;
             color: white;
             border: 2px solid white;
         }
 
-        .btn-outline-hero:hover {
+        .btn-hero-secondary:hover {
             background: white;
             color: var(--primary);
-            transform: translateY(-2px);
+            text-decoration: none;
         }
 
+        /* Features Section */
         .features {
-            padding: 4rem 0;
+            padding: 60px 0;
+            background: white;
         }
 
         .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--dark);
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 50px;
         }
 
         .feature-card {
             background: white;
-            border-radius: 15px;
-            padding: 2rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 30px 20px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border: none;
+            transition: all 0.2s ease;
             height: 100%;
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+            transform: translateY(-3px);
         }
 
         .feature-icon {
             width: 60px;
             height: 60px;
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 1.5rem;
+            margin: 0 auto 20px;
+            font-size: 24px;
             color: white;
-        }
-
-        .feature-icon.patient {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .feature-icon.doctor {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .feature-icon.admin {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
 
         .feature-title {
-            font-size: 1.25rem;
+            font-size: 20px;
             font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 1rem;
+            color: #333;
+            margin-bottom: 15px;
         }
 
         .feature-text {
-            color: var(--muted);
+            color: #666;
             line-height: 1.6;
-            font-size: 0.95rem;
+            font-size: 15px;
         }
 
+        /* Stats Section */
         .stats {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            padding: 3rem 0;
-            color: white;
+            background: var(--primary-bg);
+            padding: 50px 0;
         }
 
-        .stat-card {
+        .stat-item {
             text-align: center;
-            padding: 1.5rem;
+            padding: 20px;
         }
 
         .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+            font-size: 36px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
         }
 
         .stat-label {
-            font-size: 1rem;
-            opacity: 0.9;
+            font-size: 16px;
+            color: #666;
         }
 
+        /* Footer */
         .footer {
-            background: var(--dark);
+            background: #333;
             color: white;
-            padding: 2rem 0;
+            padding: 40px 0;
             text-align: center;
         }
 
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
         .footer-logo {
-            font-size: 1.25rem;
+            font-size: 24px;
             font-weight: 600;
+            margin-bottom: 15px;
         }
 
         .footer-text {
-            color: #a0aec0;
-            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 20px;
         }
 
         .social-links {
             display: flex;
-            gap: 1rem;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
         }
 
         .social-link {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
             background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: background 0.2s ease;
         }
 
         .social-link:hover {
             background: var(--primary);
-            transform: translateY(-2px);
+            color: white;
         }
 
+        .footer-bottom {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .hero {
-                min-height: 50vh;
-                padding: 2rem 0;
+                padding: 40px 0;
             }
-            
+
             .hero-title {
-                font-size: 2rem;
+                font-size: 36px;
             }
-            
+
             .hero-subtitle {
-                font-size: 1rem;
+                font-size: 16px;
             }
-            
-            .cta-buttons {
+
+            .hero-buttons {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .btn-hero {
                 width: 100%;
                 max-width: 250px;
             }
-            
-            .features {
-                padding: 3rem 0;
-            }
-            
+
             .section-title {
-                font-size: 1.75rem;
+                font-size: 28px;
+            }
+
+            .features {
+                padding: 40px 0;
+            }
+
+            .stats {
+                padding: 30px 0;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8 text-center hero-content">
-                    <div class="logo">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    
-                    <h1 class="hero-title">HealthCare+</h1>
-                    <p class="hero-subtitle">
-                        Connect with verified doctors and manage your health effortlessly
-                    </p>
-                    
-                    <div class="cta-buttons">
-                        <a href="{{ route('login') }}" class="btn-hero btn-primary-hero">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Sign In
-                        </a>
-                        <a href="{{ route('register') }}" class="btn-hero btn-outline-hero">
-                            <i class="fas fa-user-plus"></i>
-                            Get Started
-                        </a>
-                    </div>
-                </div>
+            <div class="hero-logo">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+
+            <h1 class="hero-title">DocTime</h1>
+            <p class="hero-subtitle">
+                Connect with verified doctors and manage your health appointments
+            </p>
+
+            <div class="hero-buttons">
+                <a href="{{ route('login') }}" class="btn-hero btn-hero-primary">
+                    Sign In
+                </a>
+                <a href="{{ route('register') }}" class="btn-hero btn-hero-secondary">
+                    Get Started
+                </a>
             </div>
         </div>
     </section>
@@ -332,35 +300,35 @@
     <section class="features">
         <div class="container">
             <h2 class="section-title">How It Works</h2>
-            
+
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="feature-card">
-                        <div class="feature-icon patient">
+                        <div class="feature-icon">
                             <i class="fas fa-user"></i>
                         </div>
                         <h3 class="feature-title">For Patients</h3>
                         <p class="feature-text">
-                            Find verified doctors, book appointments, and manage your health records in one place.
+                            Find verified doctors, book appointments, and manage your health records easily.
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-6">
                     <div class="feature-card">
-                        <div class="feature-icon doctor">
+                        <div class="feature-icon">
                             <i class="fas fa-user-md"></i>
                         </div>
                         <h3 class="feature-title">For Doctors</h3>
                         <p class="feature-text">
-                            Manage chambers, schedule appointments, and maintain your professional profile easily.
+                            Manage chambers, schedule appointments, and maintain your professional profile.
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-6">
                     <div class="feature-card">
-                        <div class="feature-icon admin">
+                        <div class="feature-icon">
                             <i class="fas fa-cog"></i>
                         </div>
                         <h3 class="feature-title">For Admins</h3>
@@ -378,25 +346,25 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
+                    <div class="stat-item">
                         <div class="stat-number">500+</div>
                         <div class="stat-label">Verified Doctors</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
+                    <div class="stat-item">
                         <div class="stat-number">10K+</div>
                         <div class="stat-label">Happy Patients</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
+                    <div class="stat-item">
                         <div class="stat-number">50K+</div>
                         <div class="stat-label">Appointments</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
+                    <div class="stat-item">
                         <div class="stat-number">99%</div>
                         <div class="stat-label">Satisfaction</div>
                     </div>
@@ -408,37 +376,36 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <i class="fas fa-heartbeat me-2"></i>HealthCare+
-                </div>
-                <p class="footer-text">
-                    Your trusted healthcare partner
-                </p>
-                
-                <div class="social-links">
-                    <a href="#" class="social-link">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a href="#" class="social-link">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                </div>
-                
-                <p class="footer-text mb-0">
-                    © {{ date('Y') }} HealthCare+. All rights reserved.
-                </p>
+            <div class="footer-logo">
+                <i class="fas fa-heartbeat me-2"></i>DocTime
             </div>
+            <p class="footer-text">
+                Your trusted healthcare partner
+            </p>
+
+            <div class="social-links">
+                <a href="#" class="social-link">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-link">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="social-link">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="social-link">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+
+            <p class="footer-bottom">
+                © {{ date('Y') }} DocTime. All rights reserved.
+            </p>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

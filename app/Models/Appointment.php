@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Appointment extends Model
 {
@@ -17,13 +18,13 @@ class Appointment extends Model
         'appointment_status',
         'payment_status',
         'reason',
-        'notes'
     ];
 
     protected $casts = [
-        'appointment_date' => 'datetime'
+        'appointment_date' => 'datetime',
     ];
 
+    // Relationships
     public function patient()
     {
         return $this->belongsTo(Patient::class);
@@ -37,5 +38,32 @@ class Appointment extends Model
     public function chamber()
     {
         return $this->belongsTo(Chamber::class);
+    }
+
+    // Helper methods for appointment status
+    public function isScheduled()
+    {
+        return $this->appointment_status === 'scheduled';
+    }
+
+    public function isCompleted()
+    {
+        return $this->appointment_status === 'completed';
+    }
+
+    public function isCancelled()
+    {
+        return $this->appointment_status === 'cancelled';
+    }
+
+    // Helper methods for payment status
+    public function isPaid()
+    {
+        return $this->payment_status === 'paid';
+    }
+
+    public function isUnpaid()
+    {
+        return $this->payment_status === 'unpaid';
     }
 }

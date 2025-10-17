@@ -35,15 +35,77 @@ class AppointmentController extends Controller
             'reason' => $request->reason,
         ]);
 
-        return redirect()->route('patient.appointments')->with('success', 'Appointment booked.');
+        return redirect()->route('patient.appointments')->with('success', 'Appointment booked successfully.');
     }
+
     public function myAppointments()
     {
-        $appointments = Appointment::with(['doctor', 'chamber'])
+        $appointments = Appointment::with(['doctor.user', 'chamber'])
             ->where('patient_id', auth()->user()->patient->id)
-            ->latest()
+            ->orderBy('appointment_date', 'desc')
             ->get();
 
         return view('appointments.my-appointments', compact('appointments'));
+    }
+
+    public function show(Appointment $appointment)
+    {
+        $appointment->load(['patient', 'doctor.user', 'chamber']);
+        return view('appointments.show', compact('appointment'));
+    }
+
+    public function updateStatus(Request $request, Appointment $appointment)
+    {
+        $request->validate([
+            'appointment_status' => 'required|in:scheduled,completed,cancelled'
+        ]);
+
+        // Check authorization
+        $user = auth()->user();
+        if (!$user->isAdmin() && !($user->isDoctor() && $appointment->doctor_id == $user->doctor->id)) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Update the appointment status
+        $updated = $appointment->update([
+            'appointment_status' => $request->appointment_status
+        ]);
+
+        if ($updated) {
+            return redirect()->back()->with('success', 'Appointment status updated successfully!');
+        } else {
+            return redirect()->back()->with('error', 'Failed to update appointment status.');
+        }
+    }
+
+    public function updatePaymentStatus(Request $request, Appointment $appointment)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:paid,unpaid'
+        ]);
+
+        // Check authorization
+        $user = auth()->user();
+        if (!$user->isAdmin() && !($user->isDoctor() && $appointment->doctor_id == $user->doctor->id)) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Update the payment status
+
+    \Log::info('Update attempt', [
+    'appointment_id' => $appointment->id,
+    'old_status' => $appointment->appointment_status,
+    'new_status' => $request->appointment_status ?? $request->payment_status,
+    'user_id' => auth()->id()
+]);
+        $updated = $appointment->update([
+            'payment_status' => $request->payment_status
+        ]);
+
+        if ($updated) {
+            return redirect()->back()->with('success', 'Payment status updated successfully!');
+        } else {
+            return redirect()->back()->with('error', 'Failed to update payment status.');
+        }
     }
 }

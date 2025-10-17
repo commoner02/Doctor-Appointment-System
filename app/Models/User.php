@@ -61,14 +61,14 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function isPatient()
-    {
-        return $this->role === 'patient';
-    }
-
     public function isDoctor()
     {
         return $this->role === 'doctor';
+    }
+
+    public function isPatient()
+    {
+        return $this->role === 'patient';
     }
 
     public function isVerifiedDoctor()

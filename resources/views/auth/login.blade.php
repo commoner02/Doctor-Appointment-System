@@ -1,27 +1,27 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-vh-100 d-flex align-items-center justify-content-center bg-gradient">
+    <div class="login-container">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-6 col-lg-5">
+                <div class="col-12 col-sm-10 col-md-7 col-lg-5">
                     <!-- Logo Section -->
-                    <div class="text-center mb-5">
-                        <div class="logo-container mb-4">
-                            <i class="fas fa-heartbeat logo-icon"></i>
+                    <div class="text-center mb-4">
+                        <div class="logo-icon">
+                            <i class="fas fa-heartbeat"></i>
                         </div>
-                        <h2 class="fw-bold text-white mb-2">HealthCare+</h2>
-                        <p class="text-white-50">Your health, our priority</p>
+                        <h2>DocTime</h2>
+                        <p class="subtitle">Healthcare Management System</p>
                     </div>
 
                     <!-- Login Card -->
-                    <div class="card login-card">
-                        <div class="card-body p-5">
-                            <div class="text-center mb-4">
-                                <h4 class="fw-bold text-dark">Welcome Back</h4>
-                                <p class="text-muted">Sign in to your account</p>
-                            </div>
+                    <div class="login-card">
+                        <div class="card-header">
+                            <h4>Sign In</h4>
+                            <p>Enter your credentials to continue</p>
+                        </div>
 
+                        <div class="card-body">
                             @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul class="mb-0">
@@ -35,79 +35,49 @@
                             <form method="POST" action="{{ route('login') }}">
                                 @csrf
 
-                                <!-- Email Field -->
-                                <div class="mb-4">
-                                    <label for="email" class="form-label fw-semibold">Email Address</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-envelope text-muted"></i>
-                                        </span>
-                                        <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                            id="email" name="email" value="{{ old('email') }}"
-                                            placeholder="Enter your email" required autofocus>
-                                    </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                                        name="email" value="{{ old('email') }}" placeholder="Enter your email" required
+                                        autofocus>
                                     @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
+                                        <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
 
-                                <!-- Password Field -->
-                                <div class="mb-4">
-                                    <label for="password" class="form-label fw-semibold">Password</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-lock text-muted"></i>
-                                        </span>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <div class="password-wrapper">
                                         <input type="password" class="form-control @error('password') is-invalid @enderror"
                                             id="password" name="password" placeholder="Enter your password" required>
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <button type="button" class="toggle-password" id="togglePasswordBtn"
+                                            aria-label="Show password" aria-pressed="false">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
                                     @error('password')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
+                                        <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
 
-                                <!-- Remember Me -->
-                                <div class="mb-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                                        <label class="form-check-label" for="remember">
-                                            Remember me
-                                        </label>
-                                    </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                                    <label class="form-check-label" for="remember">
+                                        Remember me
+                                    </label>
                                 </div>
 
-                                <!-- Login Button -->
-                                <div class="d-grid mb-4">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
-                                    </button>
-                                </div>
+                                <button type="submit" class="btn-login">
+                                    Sign In
+                                </button>
 
-                                <!-- Register Link -->
                                 <div class="text-center">
-                                    <p class="text-muted mb-0">
-                                        Don't have an account?
-                                        <a href="{{ route('register') }}" class="text-decoration-none fw-semibold">
-                                            Create one here
-                                        </a>
+                                    <p>Don't have an account?
+                                        <a href="{{ route('register') }}">Create one here</a>
                                     </p>
                                 </div>
                             </form>
                         </div>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="text-center mt-4">
-                        <p class="text-white-50 small">
-                            © {{ date('Y') }} HealthCare+. All rights reserved.
-                        </p>
                     </div>
                 </div>
             </div>
@@ -115,114 +85,224 @@
     </div>
 
     <style>
-        .bg-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        /* Fix: remove hard width and correct calc spacing */
+        .login-container {
+            /* was: min-height: calc(100vh-140px); width: 70%; */
+            min-height: calc(100vh - 120px);
+            width: 100%;
+            background: #f8f9fa;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
         }
 
-        .logo-container {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.1);
+        /* Optional: ensure no extra padding on main from layout */
+        main {
+            padding-bottom: 0 !important;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: #20B2AA;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .logo-icon {
-            font-size: 2.5rem;
+            margin: 0 auto 15px;
+            font-size: 24px;
             color: white;
         }
 
+        .login-container h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #20B2AA;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
         .login-card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #20B2AA;
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .card-header h4 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 5px 0;
+        }
+
+        .card-header p {
+            font-size: 14px;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 28px 32px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 6px;
+            display: block;
         }
 
         .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px 12px;
+            font-size: 14px;
+            width: 100%;
+            transition: border-color 0.2s ease;
         }
 
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: #20B2AA;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(32, 178, 170, 0.1);
         }
 
-        .input-group-text {
-            background: transparent;
-            border: 2px solid #e9ecef;
-            border-right: none;
-            border-radius: 12px 0 0 12px;
+        .form-check-label {
+            font-size: 14px;
+            color: #666;
         }
 
-        .input-group .form-control {
-            border-left: none;
-            border-radius: 0 12px 12px 0;
-        }
-
-        .input-group .form-control:focus {
-            border-left: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .btn-login {
+            background: #20B2AA;
+            color: white;
             border: none;
-            border-radius: 12px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            border-radius: 4px;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 8px 0 18px;
+            transition: background-color 0.2s ease;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        .btn-login:hover {
+            background: #178A84;
         }
 
-        .form-check-input:checked {
-            background-color: #667eea;
-            border-color: #667eea;
+        .text-center p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
         }
 
-        .text-decoration-none:hover {
-            color: #667eea !important;
+        .text-center a {
+            color: #20B2AA;
+            text-decoration: none;
+            font-weight: 500;
         }
 
+        .text-center a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 4px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        /* Password toggle */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 42px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .toggle-password:hover,
+        .toggle-password:focus {
+            color: #20B2AA;
+            outline: none;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .login-card {
-                margin: 1rem;
+            .login-container {
+                padding: 20px 15px;
             }
 
             .card-body {
-                padding: 2rem !important;
+                padding: 22px 20px;
             }
         }
     </style>
 
     <script>
-        document.getElementById('togglePassword').addEventListener('click', function () {
-            const password = document.getElementById('password');
-            const icon = this.querySelector('i');
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('password');
+            const btn = document.getElementById('togglePasswordBtn');
+            if (!input || !btn) return;
 
-            if (password.type === 'password') {
-                password.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                password.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+            const icon = btn.querySelector('i');
+            btn.addEventListener('click', () => {
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                btn.setAttribute('aria-pressed', String(show));
+                btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
         });
     </script>
 @endsection
