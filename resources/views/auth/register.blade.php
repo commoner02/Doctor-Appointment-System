@@ -36,6 +36,8 @@
                                 <div class="alert alert-success">
                                     {{ session('success') }}
                                 </div>
+
+                                
                             @endif
 
                             <form method="POST" action="{{ route('register') }}">
@@ -273,10 +275,10 @@
         }
 
         .register-container {
-            min-height: calc(100vh - 140px);
-            width: 60%;
-            background: #f8f9fa;
+            min-height: 100vh; /* Changed from calc(100vh - 140px) */
+            max-width: 55%;
             padding: 30px 15px;
+            width: 100%;
         }
 
         .logo-icon {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use function Laravel\Prompts\note;
 
 class Appointment extends Model
 {
@@ -18,6 +19,7 @@ class Appointment extends Model
         'appointment_status',
         'payment_status',
         'reason',
+        'note'
     ];
 
     protected $casts = [

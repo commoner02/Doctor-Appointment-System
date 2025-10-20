@@ -23,7 +23,7 @@ class DashboardController extends Controller
             if ($user->is_verified) {
                 return redirect()->route('doctor.dashboard');
             } else {
-                return redirect()->route('guest.waiting');
+                return redirect()->route('doctor.pending');
             }
         }
 

@@ -5,11 +5,6 @@
 
 @section('content')
     <div class="admin-dashboard">
-        <!-- Header -->
-        <div class="dashboard-header">
-            <h1>Admin Dashboard</h1>
-            <p>Healthcare Management System</p>
-        </div>
 
         <!-- Stats Cards -->
             <div class="stats-grid">
@@ -55,29 +50,6 @@
             </div>
         </div>
 
-        <!-- Management Grid -->
-        <div class="management-grid">
-            <a href="{{ route('admin.patients') }}" class="management-card">
-                <i class="fas fa-user-injured"></i>
-                <span>Patients</span>
-            </a>
-
-            <a href="{{ route('admin.doctors') }}" class="management-card">
-                <i class="fas fa-user-md"></i>
-                <span>Doctors</span>
-            </a>
-
-            <a href="{{ route('admin.chambers') }}" class="management-card">
-                <i class="fas fa-building"></i>
-                <span>Chambers</span>
-            </a>
-
-            <a href="{{ route('admin.appointments') }}" class="management-card">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Appointments</span>
-            </a>
-        </div>
-
         <!-- Content Grid -->
         <div class="content-grid">
             <!-- Recent Appointments -->
@@ -115,7 +87,7 @@
                             <div class="verification-item">
                                 <div class="doctor-info">
                                     <strong>{{ $user->name }}</strong>
-                                    <small>{{ $user->doctor->speciality }}</small>
+                                    {{-- <small>{{ $user->doctor->speciality }}</small> --}}
                                 </div>
                                 <form action="{{ route('admin.verify-doctor', $user) }}" method="POST">
                                     @csrf

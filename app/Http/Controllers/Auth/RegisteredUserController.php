@@ -4,104 +4,79 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Patient;
 use App\Models\Doctor;
+use App\Models\Patient;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rules;
-use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    public function create(): View
+    public function create()
     {
         return view('auth.register');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        // Base validation rules
-        $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:patient,doctor'],
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20'],
-        ];
+        $request->validate([
+            'role' => 'required|in:patient,doctor',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:20',
+            'password' => 'required|confirmed|min:8',
+            'speciality' => 'nullable|string|max:255',
+            'license_no' => 'nullable|string|max:255',
+            'qualifications' => 'nullable|string|max:2000',
+            'gender' => 'nullable|string|max:20',
+            'date_of_birth' => 'nullable|date',
+            'blood_group' => 'nullable|string|max:5',
+            'address' => 'nullable|string|max:1000',
+        ]);
 
-        // Add conditional validation based on role
-        if ($request->role === 'patient') {
-            $rules = array_merge($rules, [
-                'gender' => ['required', 'in:Male,Female,Other'],
-                'date_of_birth' => ['required', 'date'],
-                'blood_group' => ['required', 'string'],
-                'address' => ['required', 'string'],
+        $user = User::create([
+            'role' => $request->role,
+            'name' => $request->first_name . ' ' . $request->last_name,
+            'email' => $request->email,
+            'is_verified' => $request->role === 'doctor' ? false : true, // doctors start pending
+            'password' => Hash::make($request->password),
+        ]);
+
+        if ($user->role === 'doctor') {
+            Doctor::create([
+                'user_id' => $user->id,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'phone' => $request->phone,
+                'speciality' => $request->speciality,
+                'license_no' => $request->license_no,
+                'qualifications' => $request->qualifications,
+                // removed is_verified here (it's on users table)
             ]);
-        } elseif ($request->role === 'doctor') {
-            $rules = array_merge($rules, [
-                'speciality' => ['required', 'string'],
-                'license_no' => ['required', 'string'],
-                'qualifications' => ['required', 'string'],
+        } else {
+            Patient::create([
+                'user_id' => $user->id,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'phone' => $request->phone,
+                'gender' => $request->gender,
+                'date_of_birth' => $request->date_of_birth,
+                'blood_group' => $request->blood_group,
+                'address' => $request->address,
             ]);
         }
 
-        $request->validate($rules);
+        event(new Registered($user));
+        Auth::login($user);
 
-        try {
-            DB::beginTransaction();
-
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => $request->role,
-                'is_verified' => $request->role === 'patient' ? true : false,
-            ]);
-
-            if ($request->role === 'patient') {
-                Patient::create([
-                    'user_id' => $user->id,
-                    'first_name' => $request->first_name,
-                    'last_name' => $request->last_name,
-                    'gender' => $request->gender,
-                    'phone' => $request->phone,
-                    'date_of_birth' => $request->date_of_birth,
-                    'blood_group' => $request->blood_group,
-                    'address' => $request->address,
-                ]);
-            } else {
-                Doctor::create([
-                    'user_id' => $user->id,
-                    'first_name' => $request->first_name,
-                    'last_name' => $request->last_name,
-                    'speciality' => $request->speciality,
-                    'phone' => $request->phone,
-                    'license_no' => $request->license_no,
-                    'qualifications' => $request->qualifications,
-                ]);
-            }
-
-            DB::commit();
-
-            event(new Registered($user));
-            Auth::login($user);
-
-            // Redirect based on role
-            if ($user->role === 'patient') {
-                return redirect()->route('patient.dashboard')->with('success', 'Registration successful!');
-            } else {
-                return redirect()->route('guest.waiting')->with('success', 'Registration successful! Please wait for admin verification.');
-            }
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            return redirect()->back()->withErrors(['error' => 'Registration failed. Please try again.'])->withInput();
+        if ($user->role === 'doctor') {
+            return $user->is_verified
+                ? redirect()->route('doctor.dashboard')
+                : redirect()->route('doctor.pending');
         }
+
+        return redirect()->route('dashboard');
     }
 }

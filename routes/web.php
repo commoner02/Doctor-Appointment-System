@@ -7,19 +7,22 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ChamberController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/test', function () {
+    return view('test');
+});
+
+
 require __DIR__ . '/auth.php';
 
 Route::middleware(['auth'])->group(function () {
     // Main dashboard redirect
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -32,7 +35,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'myAppointments'])->name('appointments');
         Route::get('/doctors', [PatientController::class, 'findDoctors'])->name('doctors');
     });
-
     // Doctor routes
     Route::prefix('doctor')->name('doctor.')->group(function () {
         Route::get('/dashboard', [DoctorController::class, 'dashboard'])->name('dashboard');
@@ -81,6 +83,8 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])->name('update-status');
         Route::patch('/{appointment}/update-payment', [AppointmentController::class, 'updatePaymentStatus'])->name('update-payment');
     });
+
+    Route::get('/pending', [DoctorController::class, 'pending'])->name('doctors.pending');
 
     // Public-facing routes (for viewing doctor profiles and patient info)
     Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');

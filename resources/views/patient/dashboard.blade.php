@@ -4,13 +4,6 @@
 
 @section('content')
     <div class="patient-dashboard">
-        <!-- Header -->
-        <div class="dashboard-header">
-            <h1>Welcome, {{ auth()->user()->name }}!</h1>
-            <p>Manage your health appointments</p>
-        </div>
-
-        <!-- Stats Cards -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">
@@ -44,20 +37,6 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="quick-actions">
-            <a href="{{ route('patient.doctors') }}" class="action-btn primary">
-                <i class="fas fa-search"></i>
-                Find Doctors
-            </a>
-            <a href="{{ route('patient.appointments') }}" class="action-btn secondary">
-                <i class="fas fa-list"></i>
-                My Appointments
-            </a>
-            <a href="{{ route('profile.edit') }}" class="action-btn secondary">
-                <i class="fas fa-user-edit"></i>
-                Edit Profile
-            </a>
-        </div>
 
         <!-- Content Grid -->
         <div class="content-grid">

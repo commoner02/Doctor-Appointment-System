@@ -46,6 +46,7 @@ class ChamberController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'visiting_fee' => ['required', 'numeric', 'min:0'],
             'working_days' => ['required', 'array', 'min:1'],
             'working_days.*' => ['in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday'],
         ]);
@@ -60,6 +61,7 @@ class ChamberController extends Controller
                 'phone' => $request->phone,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
+                'visiting_fee' => $request->visiting_fee,
                 'working_days' => implode(',', $request->working_days),
             ]);
 
@@ -98,6 +100,7 @@ class ChamberController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'visiting_fee' => ['required', 'numeric', 'min:0'],
             'working_days' => ['required', 'array', 'min:1'],
             'working_days.*' => ['in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday'],
         ]);
@@ -111,6 +114,7 @@ class ChamberController extends Controller
                 'phone' => $request->phone,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
+                'visiting_fee' => $request->visiting_fee,
                 'working_days' => implode(',', $request->working_days),
             ]);
 

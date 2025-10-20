@@ -62,6 +62,11 @@
                                                         <i class="fas fa-calendar-week me-2"></i>
                                                         <small>{{ implode(', ', $chamber->working_days) }}</small>
                                                     </div>
+                                                    <div class="d-flex align-items-center text-primary mb-1">
+                                                        <i class="fas fa-money-bill-wave me-2"></i>
+                                                        <small><strong>৳{{ number_format($chamber->visiting_fee, 0) }}</strong>
+                                                            Visiting Fee</small>
+                                                    </div>
                                                     @if($chamber->phone)
                                                         <div class="d-flex align-items-center text-muted">
                                                             <i class="fas fa-phone me-2"></i>

@@ -1,3 +1,4 @@
+
 @extends('layouts.guest')
 
 @section('content')
@@ -38,8 +39,7 @@
                                 <div class="form-group">
                                     <label for="email">Email Address</label>
                                     <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
-                                        name="email" value="{{ old('email') }}" placeholder="Enter your email" required
-                                        autofocus>
+                                        name="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
                                     @error('email')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -50,8 +50,7 @@
                                     <div class="password-wrapper">
                                         <input type="password" class="form-control @error('password') is-invalid @enderror"
                                             id="password" name="password" placeholder="Enter your password" required>
-                                        <button type="button" class="toggle-password" id="togglePasswordBtn"
-                                            aria-label="Show password" aria-pressed="false">
+                                        <button type="button" class="toggle-password" id="togglePasswordBtn" aria-label="Show password" aria-pressed="false">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -71,7 +70,7 @@
                                     Sign In
                                 </button>
 
-                                <div class="text-center">
+                                <div class="text-center mt-3">
                                     <p>Don't have an account?
                                         <a href="{{ route('register') }}">Create one here</a>
                                     </p>
@@ -85,15 +84,13 @@
     </div>
 
     <style>
-        /* Fix: remove hard width and correct calc spacing */
         .login-container {
-            /* was: min-height: calc(100vh-140px); width: 70%; */
-            min-height: calc(100vh - 120px);
-            width: 100%;
+            min-height: 100vh; /* Changed from calc(100vh - 140px) */
             background: #f8f9fa;
             padding: 40px 20px;
             display: flex;
             align-items: center;
+            width: 100%;
         }
 
         /* Optional: ensure no extra padding on main from layout */
@@ -252,11 +249,9 @@
         .password-wrapper {
             position: relative;
         }
-
         .password-wrapper .form-control {
             padding-right: 42px;
         }
-
         .toggle-password {
             position: absolute;
             right: 10px;
@@ -269,7 +264,6 @@
             padding: 0;
             line-height: 1;
         }
-
         .toggle-password:hover,
         .toggle-password:focus {
             color: #20B2AA;
@@ -298,8 +292,6 @@
             btn.addEventListener('click', () => {
                 const show = input.type === 'password';
                 input.type = show ? 'text' : 'password';
-                btn.setAttribute('aria-pressed', String(show));
-                btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
                 icon.classList.toggle('fa-eye');
                 icon.classList.toggle('fa-eye-slash');
             });

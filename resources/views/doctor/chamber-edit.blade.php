@@ -1,6 +1,8 @@
+{{-- filepath: /opt/lampp/htdocs/DocTime-Project/docTime/resources/views/doctor/chamber-edit.blade.php --}}
+
 @extends('layouts.app')
 
-@section('title', 'Add Chamber')
+@section('title', 'Edit Chamber')
 
 @section('content')
     <div class="chamber-form-page">
@@ -9,8 +11,8 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="header-card">
-                        <h1><i class="fas fa-plus-circle me-2"></i>Add New Chamber</h1>
-                        <p class="text-muted">Create a new medical chamber for appointments</p>
+                        <h1><i class="fas fa-edit me-2"></i>Edit Chamber</h1>
+                        <p class="text-muted">Update chamber information and settings</p>
                     </div>
                 </div>
             </div>
@@ -18,8 +20,9 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="form-card">
-                        <form method="POST" action="{{ route('chambers.store') }}">
+                        <form method="POST" action="{{ route('chambers.update', $chamber) }}">
                             @csrf
+                            @method('PUT')
 
                             @if ($errors->any())
                                 <div class="alert alert-danger">
@@ -39,7 +42,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="chamber_name" class="form-label">Chamber Name *</label>
                                         <input type="text" class="form-control @error('chamber_name') is-invalid @enderror" 
-                                               id="chamber_name" name="chamber_name" value="{{ old('chamber_name') }}" 
+                                               id="chamber_name" name="chamber_name" value="{{ old('chamber_name', $chamber->chamber_name) }}" 
                                                placeholder="e.g., City Medical Center" required>
                                         @error('chamber_name')
                                             <span class="invalid-feedback">{{ $message }}</span>
@@ -48,7 +51,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="phone" class="form-label">Chamber Phone</label>
                                         <input type="text" class="form-control @error('phone') is-invalid @enderror" 
-                                               id="phone" name="phone" value="{{ old('phone') }}" 
+                                               id="phone" name="phone" value="{{ old('phone', $chamber->phone) }}" 
                                                placeholder="e.g., +880 123 456 7890">
                                         @error('phone')
                                             <span class="invalid-feedback">{{ $message }}</span>
@@ -61,7 +64,7 @@
                                         <label for="chamber_location" class="form-label">Chamber Location</label>
                                         <textarea class="form-control @error('chamber_location') is-invalid @enderror" 
                                                   id="chamber_location" name="chamber_location" rows="2" 
-                                                  placeholder="Full address of the chamber">{{ old('chamber_location') }}</textarea>
+                                                  placeholder="Full address of the chamber">{{ old('chamber_location', $chamber->chamber_location) }}</textarea>
                                         @error('chamber_location')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -69,7 +72,7 @@
                                     <div class="col-md-4 mb-3">
                                         <label for="visiting_fee" class="form-label">Visiting Fee (৳) *</label>
                                         <input type="number" class="form-control @error('visiting_fee') is-invalid @enderror" 
-                                               id="visiting_fee" name="visiting_fee" value="{{ old('visiting_fee') }}" 
+                                               id="visiting_fee" name="visiting_fee" value="{{ old('visiting_fee', $chamber->visiting_fee) }}" 
                                                placeholder="500" min="0" step="1" required>
                                         @error('visiting_fee')
                                             <span class="invalid-feedback">{{ $message }}</span>
@@ -86,7 +89,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="start_time" class="form-label">Start Time *</label>
                                         <input type="time" class="form-control @error('start_time') is-invalid @enderror" 
-                                               id="start_time" name="start_time" value="{{ old('start_time') }}" required>
+                                               id="start_time" name="start_time" value="{{ old('start_time', $chamber->start_time) }}" required>
                                         @error('start_time')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -94,7 +97,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="end_time" class="form-label">End Time *</label>
                                         <input type="time" class="form-control @error('end_time') is-invalid @enderror" 
-                                               id="end_time" name="end_time" value="{{ old('end_time') }}" required>
+                                               id="end_time" name="end_time" value="{{ old('end_time', $chamber->end_time) }}" required>
                                         @error('end_time')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -109,7 +112,7 @@
                                 <div class="working-days">
                                     @php
                                         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                                        $selectedDays = old('working_days', []);
+                                        $selectedDays = old('working_days', $chamber->working_days);
                                     @endphp
                                     @foreach($days as $day)
                                         <div class="day-checkbox">
@@ -132,7 +135,7 @@
                                     <i class="fas fa-arrow-left me-1"></i>Cancel
                                 </a>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i>Create Chamber
+                                    <i class="fas fa-save me-1"></i>Update Chamber
                                 </button>
                             </div>
                         </form>
@@ -142,158 +145,8 @@
         </div>
     </div>
 
+    <!-- Same styles as chamber-create.blade.php -->
     <style>
-        :root {
-            --primary: #20B2AA;
-            --primary-dark: #178A84;
-        }
-
-        .chamber-form-page {
-            background-color: #f8f9fa;
-            min-height: calc(100vh - 60px);
-        }
-
-        .header-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        .header-card h1 {
-            color: var(--primary);
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        .form-section {
-            margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .form-section:last-of-type {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .form-section h5 {
-            color: var(--primary);
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: #495057;
-            margin-bottom: 8px;
-        }
-
-        .form-control {
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 10px 12px;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(32, 178, 170, 0.1);
-        }
-
-        .working-days {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-        }
-
-        .day-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .day-checkbox:hover {
-            background: #f8f9fa;
-            border-color: var(--primary);
-        }
-
-        .day-checkbox input[type="checkbox"]:checked + label {
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        .form-check-input {
-            border-color: #ddd;
-        }
-
-        .form-check-input:checked {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .form-check-label {
-            cursor: pointer;
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: end;
-            gap: 10px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
-        }
-
-        .alert {
-            border: none;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-
-        .alert ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .form-card {
-                padding: 20px;
-            }
-
-            .working-days {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-        }
+        /* ... same styles as create form ... */
     </style>
 @endsection
