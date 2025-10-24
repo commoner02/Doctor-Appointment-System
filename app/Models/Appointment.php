@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
@@ -14,13 +14,20 @@ class Appointment extends Model
         'doctor_id',
         'chamber_id',
         'appointment_date',
+        'appointment_time',
         'status',
-        'reason'
+        'fee',
+        'payment_status',
+        'notes',
+        'prescription',
     ];
 
-    protected $casts = [
-        'appointment_date' => 'datetime'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'appointment_date' => 'date',
+        ];
+    }
 
     public function patient()
     {

@@ -3,110 +3,90 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoctorController;
-use App\Http\Controllers\DoctorApprovalController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ChamberController;
 use Illuminate\Support\Facades\Route;
 
-// Welcome page
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-// Authentication Routes (login, register, logout)
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
-// Protected routes - must be authenticated
 Route::middleware(['auth'])->group(function () {
-    // Main dashboard route - redirects based on role
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // Patient-specific routes
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/patient/dashboard', function () {
-            // Only allow patients to access this
-            if (auth()->user()->role !== 'patient') {
-                return redirect()->route('dashboard');
-            }
-            
-            $departments = \App\Models\Department::with('doctors')->get();
-            $myAppointments = collect(); // Empty collection for now
-            
-            if (auth()->user()->patient) {
-                $myAppointments = \App\Models\Appointment::with('doctor')
-                    ->where('patient_id', auth()->user()->patient->id)
-                    ->latest()
-                    ->limit(5)
-                    ->get();
-            }
-            
-            return view('patient.dashboard', compact('departments', 'myAppointments'));
-        })->name('patient.dashboard');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Patient routes
+    Route::middleware('role:patient')->prefix('patient')->name('patient.')->group(function () {
+        Route::get('/dashboard', [PatientController::class, 'dashboard'])->name('dashboard');
+        Route::get('/doctors', [PatientController::class, 'findDoctors'])->name('doctors');
+        Route::get('/appointments', [PatientController::class, 'appointments'])->name('appointments');
     });
 
-    // Doctor-specific routes
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/doctor/dashboard', function () {
-            // Only allow doctors to access this
-            if (auth()->user()->role !== 'doctor') {
-                return redirect()->route('dashboard');
-            }
-            
-            $todayAppointments = collect();
-            $totalAppointments = 0;
-            
-            if (auth()->user()->doctor) {
-                $todayAppointments = \App\Models\Appointment::with('patient')
-                    ->where('doctor_id', auth()->user()->doctor->id)
-                    ->whereDate('appointment_date', today())
-                    ->get();
-                    
-                $totalAppointments = \App\Models\Appointment::where('doctor_id', auth()->user()->doctor->id)->count();
-            }
-            
-            return view('doctor.dashboard', compact('todayAppointments', 'totalAppointments'));
-        })->name('doctor.dashboard');
-        
-        Route::get('/doctor/appointments', function () {
-            if (auth()->user()->role !== 'doctor') {
-                return redirect()->route('dashboard');
-            }
-            
-            $appointments = collect();
-            if (auth()->user()->doctor) {
-                $appointments = \App\Models\Appointment::with('patient')
-                    ->where('doctor_id', auth()->user()->doctor->id)
-                    ->latest()
-                    ->get();
-            }
-            
-            return view('doctor.appointment', compact('appointments'));
-        })->name('doctor.appointments');
+    // Doctor routes
+    Route::middleware('role:doctor')->prefix('doctor')->name('doctor.')->group(function () {
+        Route::get('/dashboard', [DoctorController::class, 'dashboard'])->name('dashboard');
+        Route::get('/appointments', [DoctorController::class, 'appointments'])->name('appointments');
+        Route::get('/chambers', [DoctorController::class, 'chambers'])->name('chambers');
     });
 
-    // Admin-specific routes
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/admin/dashboard', function () {
-            // Only allow admins to access this
-            if (auth()->user()->role !== 'admin') {
-                return redirect()->route('dashboard');
-            }
-            
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
+    // Admin routes
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
+        Route::get('/doctors', [AdminController::class, 'doctors'])->name('doctors');
+        Route::get('/chambers', [AdminController::class, 'chambers'])->name('chambers');
+
+        // Admin appointment management
+        Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
+        Route::get('/appointments/{appointment}', [AdminController::class, 'showAppointment'])->name('appointments.show');
+        Route::patch('/appointments/{appointment}/status', [AdminController::class, 'updateAppointmentStatus'])->name('appointments.update-status');
+        Route::delete('/appointments/{appointment}', [AdminController::class, 'deleteAppointment'])->name('appointments.delete');
+
+        // Doctor verification
+        Route::patch('/doctors/{doctor}/verify', [AdminController::class, 'verifyDoctor'])->name('doctors.verify');
+        Route::patch('/doctors/{doctor}/reject', [AdminController::class, 'rejectDoctor'])->name('doctors.reject');
     });
 
-    Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/pending-doctors', [DoctorApprovalController::class, 'pendingDoctors'])->name('admin.pending-doctors');
-    Route::post('/approve-doctor/{user}', [DoctorApprovalController::class, 'approveDoctor'])->name('admin.approve-doctor');
-    Route::post('/reject-doctor/{user}', [DoctorApprovalController::class, 'rejectDoctor'])->name('admin.reject-doctor');
+    // Public routes
+    Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctor.show');
+    Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patient.show');
+
+    // Appointment routes (for all authenticated users)
+    Route::prefix('appointments')->name('appointments.')->group(function () {
+        Route::get('/create/{doctor}', [AppointmentController::class, 'create'])->name('create');
+        Route::post('/', [AppointmentController::class, 'store'])->name('store');
+        Route::get('/{appointment}', [AppointmentController::class, 'show'])->name('show');
+        Route::get('/{appointment}/edit', [AppointmentController::class, 'edit'])->name('edit');
+        Route::put('/{appointment}', [AppointmentController::class, 'update'])->name('update');
+        Route::patch('/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('update-status');
+        Route::patch('/{appointment}/payment', [AppointmentController::class, 'updatePayment'])->name('update-payment');
+        Route::delete('/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
+        Route::get('/', [AppointmentController::class, 'index'])->name('index');
+    });
+
+    // Chamber routes
+    Route::middleware('role:doctor')->prefix('chambers')->name('chambers.')->group(function () {
+        Route::get('/create', [ChamberController::class, 'create'])->name('create');
+        Route::post('/', [ChamberController::class, 'store'])->name('store');
+        Route::get('/{chamber}/edit', [ChamberController::class, 'edit'])->name('edit');
+        Route::put('/{chamber}', [ChamberController::class, 'update'])->name('update');
+        Route::delete('/{chamber}', [ChamberController::class, 'destroy'])->name('destroy');
+    });
 });
 
-    // Common routes (accessible by all authenticated users)
-    Route::get('/doctors', [DoctorController::class, 'browse'])->name('doctors.browse');
-    Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
-    
-    // Appointment routes (mainly for patients)
-    Route::get('/appointments/create/{doctor}', [AppointmentController::class, 'create'])->name('appointments.create');
-    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-    Route::get('/my-appointments', [AppointmentController::class, 'myAppointments'])->name('appointments.my');
-});
+// Waiting page for unverified users
+Route::get('/waiting', function () {
+    return view('guest.waiting');
+})->name('guest.waiting')->middleware('auth');
+
+// Add this route for pending verification page
+Route::get('/doctor/pending-verification', function () {
+    return view('doctor.pending-verification');
+})->name('doctor.pending-verification');

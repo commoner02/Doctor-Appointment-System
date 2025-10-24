@@ -26,16 +26,27 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        $user = $request->user();
+        $user = Auth::user();
 
-        if (!$user->canLogin()) {
-            Auth::guard('web')->logout();
-            return redirect()->route('login')->withErrors(['email' => 'Your account is not active. Please contact support.']);
+        // Check if doctor is verified
+        if ($user->role === 'doctor') {
+            if ($user->status === 'pending' || ($user->doctor && $user->doctor->verification_status !== 'verified')) {
+                Auth::logout();
+                return redirect()->route('doctor.pending-verification')
+                    ->with('error', 'Your account is pending verification. Please wait for admin approval.');
+            }
+        }
+
+        // Check if user is active
+        if ($user->status !== 'active') {
+            Auth::logout();
+            return redirect()->route('login')
+                ->with('error', 'Your account is inactive. Please contact support.');
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('dashboard'));
     }
 
     /**

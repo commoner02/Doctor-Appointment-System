@@ -1,3 +1,70 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+    :root {
+        --primary-50: #f0fdfa;
+        --primary-100: #ccfbf1;
+        --primary-200: #99f6e4;
+        --primary-300: #5eead4;
+        --primary-400: #2dd4bf;
+        --primary-500: #20b2aa;
+        --primary-600: #0d9488;
+        --primary-700: #0f766e;
+        --primary-800: #115e59;
+        --primary-900: #134e4a;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 font-medium transition-colors duration-200;
+    }
+
+    .btn-secondary {
+        @apply px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors duration-200;
+    }
+
+    .card {
+        @apply bg-white rounded-lg shadow-sm border border-gray-200;
+    }
+
+    .input-field {
+        @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+    }
+}
+
+/* Animation for smooth transitions */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #20b2aa;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0d9488;
+}
