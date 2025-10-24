@@ -23,50 +23,32 @@ class ChamberController extends Controller
 
     public function create()
     {
-        $user = auth()->user();
-
-        if (!$user->isDoctor() || !$user->is_verified) {
-            abort(403, 'Unauthorized');
-        }
-
         return view('chambers.create');
     }
 
     public function store(Request $request)
     {
-        $user = auth()->user();
-
-        if (!$user->isDoctor() || !$user->is_verified) {
-            abort(403, 'Unauthorized');
-        }
-
-        $validated = $request->validate([
-            'chamber_name' => 'required|string|max:255',
-            'chamber_location' => 'required|string|max:500',
-            'phone' => 'required|string|max:20',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'visiting_fee' => 'required|numeric|min:0',
-            'working_days' => 'required|array|min:1',
-            'working_days.*' => 'in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday'
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'phone' => 'nullable|string|max:20',
+            'visiting_hours' => 'nullable|string|max:255',
+            'fee' => 'nullable|numeric|min:0',
         ]);
 
-        $doctor = $user->doctor;
-
-        // Convert array to comma-separated string
-        $workingDaysString = is_array($validated['working_days'])
-            ? implode(',', $validated['working_days'])
-            : $validated['working_days'];
+        $doctor = auth()->user()->doctor;
+        if (!$doctor) {
+            return redirect()->back()->with('error', 'Doctor profile not found.');
+        }
 
         Chamber::create([
             'doctor_id' => $doctor->id,
-            'chamber_name' => $validated['chamber_name'],
-            'chamber_location' => $validated['chamber_location'],
-            'phone' => $validated['phone'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'visiting_fee' => $validated['visiting_fee'],
-            'working_days' => $workingDaysString
+            'name' => $request->name,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'visiting_hours' => $request->visiting_hours,
+            'fee' => $request->fee,
+            'is_active' => true,
         ]);
 
         return redirect()->route('doctor.chambers')->with('success', 'Chamber added successfully!');
@@ -74,10 +56,9 @@ class ChamberController extends Controller
 
     public function edit(Chamber $chamber)
     {
-        $user = auth()->user();
-
-        if (!$user->isDoctor() || !$user->is_verified || $chamber->doctor_id !== $user->doctor->id) {
-            abort(403, 'Unauthorized');
+        // Ensure the chamber belongs to the authenticated doctor
+        if ($chamber->doctor->user_id !== auth()->id()) {
+            abort(403);
         }
 
         return view('chambers.edit', compact('chamber'));
@@ -85,47 +66,29 @@ class ChamberController extends Controller
 
     public function update(Request $request, Chamber $chamber)
     {
-        $user = auth()->user();
-
-        if (!$user->isDoctor() || !$user->is_verified || $chamber->doctor_id !== $user->doctor->id) {
-            abort(403, 'Unauthorized');
+        // Ensure the chamber belongs to the authenticated doctor
+        if ($chamber->doctor->user_id !== auth()->id()) {
+            abort(403);
         }
 
-        $validated = $request->validate([
-            'chamber_name' => 'required|string|max:255',
-            'chamber_location' => 'required|string|max:500',
-            'phone' => 'required|string|max:20',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'visiting_fee' => 'required|numeric|min:0',
-            'working_days' => 'required|array|min:1',
-            'working_days.*' => 'in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday'
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'phone' => 'nullable|string|max:20',
+            'visiting_hours' => 'nullable|string|max:255',
+            'fee' => 'nullable|numeric|min:0',
         ]);
 
-        // Convert array to comma-separated string
-        $workingDaysString = is_array($validated['working_days'])
-            ? implode(',', $validated['working_days'])
-            : $validated['working_days'];
-
-        $chamber->update([
-            'chamber_name' => $validated['chamber_name'],
-            'chamber_location' => $validated['chamber_location'],
-            'phone' => $validated['phone'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'visiting_fee' => $validated['visiting_fee'],
-            'working_days' => $workingDaysString
-        ]);
+        $chamber->update($request->only(['name', 'address', 'phone', 'visiting_hours', 'fee']));
 
         return redirect()->route('doctor.chambers')->with('success', 'Chamber updated successfully!');
     }
 
     public function destroy(Chamber $chamber)
     {
-        $user = auth()->user();
-
-        if (!$user->isDoctor() || !$user->is_verified || $chamber->doctor_id !== $user->doctor->id) {
-            abort(403, 'Unauthorized');
+        // Ensure the chamber belongs to the authenticated doctor
+        if ($chamber->doctor->user_id !== auth()->id()) {
+            abort(403);
         }
 
         $chamber->delete();

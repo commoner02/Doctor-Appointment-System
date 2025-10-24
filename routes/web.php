@@ -9,63 +9,70 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ChamberController;
 use Illuminate\Support\Facades\Route;
 
-// Welcome page
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Authentication Routes
 require __DIR__ . '/auth.php';
 
-// Protected routes - must be authenticated
 Route::middleware(['auth'])->group(function () {
-
-    // Main dashboard route - redirects based on role
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Patient routes
-    Route::prefix('patient')->name('patient.')->middleware(\App\Http\Middleware\CheckRole::class . ':patient')->group(function () {
+    Route::middleware('role:patient')->prefix('patient')->name('patient.')->group(function () {
         Route::get('/dashboard', [PatientController::class, 'dashboard'])->name('dashboard');
-        Route::get('/appointments', [PatientController::class, 'appointments'])->name('appointments');
         Route::get('/doctors', [PatientController::class, 'findDoctors'])->name('doctors');
-        Route::get('/profile', [PatientController::class, 'show'])->name('show');
+        Route::get('/appointments', [PatientController::class, 'appointments'])->name('appointments');
     });
 
     // Doctor routes
-    Route::prefix('doctor')->name('doctor.')->middleware(\App\Http\Middleware\CheckRole::class . ':doctor')->group(function () {
+    Route::middleware('role:doctor')->prefix('doctor')->name('doctor.')->group(function () {
         Route::get('/dashboard', [DoctorController::class, 'dashboard'])->name('dashboard');
         Route::get('/appointments', [DoctorController::class, 'appointments'])->name('appointments');
         Route::get('/chambers', [DoctorController::class, 'chambers'])->name('chambers');
-        Route::get('/pending', [DoctorController::class, 'pendingVerification'])->name('pending');
-        Route::get('/browse', [DoctorController::class, 'browse'])->name('browse');
     });
 
     // Admin routes
-    Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\CheckRole::class . ':admin')->group(function () {
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-        Route::post('/doctors/{user}/verify', [AdminController::class, 'verifyDoctor'])->name('doctors.verify');
+        Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
+        Route::get('/doctors', [AdminController::class, 'doctors'])->name('doctors');
+        Route::get('/chambers', [AdminController::class, 'chambers'])->name('chambers');
+
+        // Admin appointment management
+        Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
+        Route::get('/appointments/{appointment}', [AdminController::class, 'showAppointment'])->name('appointments.show');
+        Route::patch('/appointments/{appointment}/status', [AdminController::class, 'updateAppointmentStatus'])->name('appointments.update-status');
+        Route::delete('/appointments/{appointment}', [AdminController::class, 'deleteAppointment'])->name('appointments.delete');
+
+        // Doctor verification
+        Route::patch('/doctors/{doctor}/verify', [AdminController::class, 'verifyDoctor'])->name('doctors.verify');
+        Route::patch('/doctors/{doctor}/reject', [AdminController::class, 'rejectDoctor'])->name('doctors.reject');
     });
 
-    // Public doctor viewing (accessible to all authenticated users)
+    // Public routes
     Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctor.show');
+    Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patient.show');
 
-    // Appointment routes
+    // Appointment routes (for all authenticated users)
     Route::prefix('appointments')->name('appointments.')->group(function () {
         Route::get('/create/{doctor}', [AppointmentController::class, 'create'])->name('create');
         Route::post('/', [AppointmentController::class, 'store'])->name('store');
-        Route::get('/my-appointments', [AppointmentController::class, 'myAppointments'])->name('my');
         Route::get('/{appointment}', [AppointmentController::class, 'show'])->name('show');
+        Route::get('/{appointment}/edit', [AppointmentController::class, 'edit'])->name('edit');
+        Route::put('/{appointment}', [AppointmentController::class, 'update'])->name('update');
         Route::patch('/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('update-status');
+        Route::patch('/{appointment}/payment', [AppointmentController::class, 'updatePayment'])->name('update-payment');
         Route::delete('/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
+        Route::get('/', [AppointmentController::class, 'index'])->name('index');
     });
 
-    // Chamber routes (accessible to doctors)
-    Route::prefix('chambers')->name('chambers.')->middleware(\App\Http\Middleware\CheckRole::class . ':doctor')->group(function () {
+    // Chamber routes
+    Route::middleware('role:doctor')->prefix('chambers')->name('chambers.')->group(function () {
         Route::get('/create', [ChamberController::class, 'create'])->name('create');
         Route::post('/', [ChamberController::class, 'store'])->name('store');
         Route::get('/{chamber}/edit', [ChamberController::class, 'edit'])->name('edit');
@@ -78,3 +85,8 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/waiting', function () {
     return view('guest.waiting');
 })->name('guest.waiting')->middleware('auth');
+
+// Add this route for pending verification page
+Route::get('/doctor/pending-verification', function () {
+    return view('doctor.pending-verification');
+})->name('doctor.pending-verification');

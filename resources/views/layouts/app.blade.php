@@ -15,18 +15,37 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#20b2aa', // Light Sea Green
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-    <!-- Custom CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <!-- Additional CSS -->
     @stack('styles')
 </head>
 
-<body class="bg-gray-50">
-    <div id="app" class="min-vh-100 d-flex flex-column">
+<body class="bg-gray-50 font-sans">
+    <div id="app" class="min-h-screen flex flex-col">
         <!-- Header -->
         @include('layouts.header')
 
@@ -34,7 +53,7 @@
         @include('layouts.navigation')
 
         <!-- Main Content -->
-        <main class="flex-grow-1 py-4">
+        <main class="flex-1 py-6">
             <!-- Page Header -->
             @hasSection('page-header')
             <div class="container-fluid px-4 mb-4">
@@ -52,27 +71,23 @@
 
             <!-- Flash Messages -->
             @if(session('success'))
-            <div class="container-fluid px-4 mb-4">
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
                 </div>
             </div>
             @endif
 
             @if(session('error'))
-            <div class="container-fluid px-4 mb-4">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
                 </div>
             </div>
             @endif
 
             <!-- Page Content -->
-            <div class="container-fluid px-4">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 @yield('content')
             </div>
         </main>

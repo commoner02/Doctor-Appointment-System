@@ -10,22 +10,15 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        if (!$user->is_verified) {
-            return redirect()->route('guest.waiting');
+        switch ($user->role) {
+            case 'patient':
+                return redirect()->route('patient.dashboard');
+            case 'doctor':
+                return redirect()->route('doctor.dashboard');
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+            default:
+                return redirect()->route('home');
         }
-
-        if ($user->isAdmin()) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        if ($user->isDoctor()) {
-            return redirect()->route('doctor.dashboard');
-        }
-
-        if ($user->isPatient()) {
-            return redirect()->route('patient.dashboard');
-        }
-
-        return redirect()->route('guest.waiting');
     }
 }

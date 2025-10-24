@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Doctor;
-use App\Models\Chamber;
+use App\Models\Patient;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
@@ -37,22 +37,37 @@ class AppointmentController extends Controller
 
         $validated = $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
-            'chamber_id' => 'required|exists:chambers,id',
-            'appointment_date' => 'required|date|after:now',
-            'reason' => 'required|string|max:500'
+            'chamber_id' => 'nullable|exists:chambers,id',
+            'appointment_date' => 'required|date|after_or_equal:today',
+            'appointment_time' => 'nullable|string',
+            'notes' => 'nullable|string|max:500',
         ]);
 
         $patient = $user->patient;
+
+        if (!$patient) {
+            $patient = Patient::create(['user_id' => $user->id]);
+        }
+
+        $chamber = null;
+        if ($request->chamber_id) {
+            $chamber = \App\Models\Chamber::find($request->chamber_id);
+        }
 
         Appointment::create([
             'patient_id' => $patient->id,
             'doctor_id' => $validated['doctor_id'],
             'chamber_id' => $validated['chamber_id'],
             'appointment_date' => $validated['appointment_date'],
-            'appointment_status' => 'scheduled',
-            'payment_status' => 'unpaid',
-            'reason' => $validated['reason']
+            'appointment_time' => $validated['appointment_time'],
+            'status' => 'pending',
+            'fee' => $chamber ? $chamber->fee : null,
+            'payment_status' => 'pending',
+            'notes' => $validated['notes'],
         ]);
+
+        // Send email notification (we'll implement this later)
+        // $this->sendAppointmentNotification($appointment, 'created');
 
         return redirect()->route('patient.appointments')->with('success', 'Appointment booked successfully!');
     }
@@ -96,7 +111,21 @@ class AppointmentController extends Controller
             'updated_at' => now()
         ]);
 
+        // Send email notification
+        // $this->sendAppointmentNotification($appointment, 'status_updated');
+
         return back()->with('success', 'Appointment status updated successfully!');
+    }
+
+    public function updatePayment(Request $request, Appointment $appointment)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:paid,pending,cancelled'
+        ]);
+
+        $appointment->update(['payment_status' => $request->payment_status]);
+
+        return back()->with('success', 'Payment status updated successfully!');
     }
 
     public function edit(Appointment $appointment)
@@ -193,5 +222,62 @@ class AppointmentController extends Controller
         $appointment->load(['patient', 'doctor', 'chamber']);
 
         return view('appointments.show', compact('appointment'));
+    }
+
+    public function index(Request $request)
+    {
+        $query = Appointment::with(['patient.user', 'doctor.user', 'chamber']);
+
+        // Apply role-based filtering
+        if (auth()->user()->isDoctor()) {
+            $query->where('doctor_id', auth()->user()->doctor->id);
+        } elseif (auth()->user()->isPatient()) {
+            $query->where('patient_id', auth()->user()->patient->id);
+        }
+        // Admin sees all appointments
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('patient.user', function ($subQ) use ($search) {
+                    $subQ->where('name', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('doctor.user', function ($subQ) use ($search) {
+                        $subQ->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
+
+        // Date filter
+        if ($request->filled('date')) {
+            $query->whereDate('appointment_date', $request->get('date'));
+        }
+
+        $appointments = $query->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
+            ->paginate(10);
+
+        // Get stats for quick overview
+        $statsQuery = Appointment::query();
+        if (auth()->user()->isDoctor()) {
+            $statsQuery->where('doctor_id', auth()->user()->doctor->id);
+        } elseif (auth()->user()->isPatient()) {
+            $statsQuery->where('patient_id', auth()->user()->patient->id);
+        }
+
+        $stats = [
+            'pending' => $statsQuery->clone()->where('status', 'pending')->count(),
+            'confirmed' => $statsQuery->clone()->where('status', 'confirmed')->count(),
+            'completed' => $statsQuery->clone()->where('status', 'completed')->count(),
+            'cancelled' => $statsQuery->clone()->where('status', 'cancelled')->count(),
+        ];
+
+        return view('appointments.index', compact('appointments', 'stats'));
     }
 }

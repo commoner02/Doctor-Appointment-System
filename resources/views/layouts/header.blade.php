@@ -1,60 +1,59 @@
-<header class="bg-white shadow-sm border-bottom">
-    <div class="container-fluid px-4">
-        <div class="d-flex justify-content-between align-items-center py-3">
-            <!-- Left: Logo and Brand -->
-            <div class="d-flex align-items-center">
-                <a href="{{ route('home') }}" class="text-decoration-none d-flex align-items-center">
-                    <div class="logo-container me-3">
-                        <i class="fas fa-heartbeat text-primary"></i>
+<header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <a href="{{ route('home') }}" class="flex items-center space-x-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-heartbeat text-white text-xl"></i>
                     </div>
-                    <h1 class="brand-name mb-0 text-primary fw-bold">DocTime</h1>
+                    <h1 class="text-2xl font-bold text-primary-600">DocTime</h1>
                 </a>
             </div>
 
-            <!-- Right: Profile Section -->
-            <div class="header-actions">
+            <!-- Profile Section -->
+            <div class="flex items-center space-x-4">
                 @auth
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" type="button"
-                            id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="avatar-circle me-2">
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open"
+                            class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none">
+                            <div
+                                class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
-                            <span class="d-none d-md-inline fw-medium">{{ auth()->user()->name }}</span>
+                            <span class="hidden md:block font-medium">{{ auth()->user()->name }}</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
                         </button>
 
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li>
-                                <div class="dropdown-header">
-                                    <strong>{{ auth()->user()->name }}</strong>
-                                    <small class="text-muted d-block">{{ ucfirst(auth()->user()->role) }}</small>
-                                </div>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                    <i class="fas fa-user me-2"></i>Profile Settings
-                                </a>
-                            </li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
+                        <div x-show="open" @click.away="open = false" x-transition
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
+                                <p class="text-xs text-gray-500">{{ ucfirst(auth()->user()->role) }}</p>
+                            </div>
+                            <a href="{{ route('profile.edit') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-user mr-2"></i>Edit Profile
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-50">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @else
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('login') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                    <div class="flex space-x-2">
+                        <a href="{{ route('login') }}"
+                            class="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700">
+                            Login
                         </a>
-                        <a href="{{ route('register') }}" class="btn btn-primary">
-                            <i class="fas fa-user-plus me-1"></i>Register
+                        <a href="{{ route('register') }}"
+                            class="px-4 py-2 text-sm font-medium bg-primary-500 text-white rounded-lg hover:bg-primary-600">
+                            Register
                         </a>
                     </div>
                 @endauth
@@ -63,57 +62,5 @@
     </div>
 </header>
 
-<style>
-    .logo-container {
-        width: 45px;
-        height: 45px;
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
-
-    .logo-container i {
-        color: white;
-    }
-
-    .brand-name {
-        font-size: 1.75rem;
-        letter-spacing: -0.025em;
-    }
-
-    .avatar-circle {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 0.875rem;
-    }
-
-    .dropdown-menu {
-        border: none;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-        padding: 0.5rem;
-        min-width: 200px;
-    }
-
-    .dropdown-item {
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-    }
-
-    .dropdown-header {
-        padding: 0.75rem 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
-    }
-</style>
+<!-- Alpine.js for dropdown -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

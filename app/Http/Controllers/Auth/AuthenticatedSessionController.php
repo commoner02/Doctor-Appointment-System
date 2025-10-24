@@ -11,44 +11,55 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    /**
+     * Display the login view.
+     */
     public function create(): View
     {
         return view('auth.login');
     }
 
+    /**
+     * Handle an incoming authentication request.
+     */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-        $request->session()->regenerate();
 
-        $user = $request->user();
+        $user = Auth::user();
 
-        // Redirect based on role and verification status
-        if ($user->isAdmin()) {
-            return redirect()->route('admin.dashboard');
-        }
-        
-        if ($user->isPatient()) {
-            return redirect()->route('patient.dashboard');
-        }
-        
-        if ($user->isDoctor()) {
-            if ($user->is_verified) {
-                return redirect()->route('doctor.dashboard');
-            } else {
-                return redirect()->route('guest.waiting');
+        // Check if doctor is verified
+        if ($user->role === 'doctor') {
+            if ($user->status === 'pending' || ($user->doctor && $user->doctor->verification_status !== 'verified')) {
+                Auth::logout();
+                return redirect()->route('doctor.pending-verification')
+                    ->with('error', 'Your account is pending verification. Please wait for admin approval.');
             }
         }
 
-        // Fallback redirect
-        return redirect('/');
+        // Check if user is active
+        if ($user->status !== 'active') {
+            Auth::logout();
+            return redirect()->route('login')
+                ->with('error', 'Your account is inactive. Please contact support.');
+        }
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('dashboard'));
     }
 
+    /**
+     * Destroy an authenticated session.
+     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
+
         $request->session()->invalidate();
+
         $request->session()->regenerateToken();
+
         return redirect('/');
     }
 }

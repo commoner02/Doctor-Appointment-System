@@ -1,136 +1,138 @@
-<!DOCTYPE html
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'DocTime') }}</title>
-
+    <title>DocTime - Healthcare Management</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
-    <!-- Vite Assets -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#20b2aa',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body class="font-inter bg-white text-gray-900">
-    <!-- Hero Section -->
-    <section class="py-16 md:py-20 px-4 bg-gradient-to-b from-primary-bg to-white">
-        <div class="text-center max-w-2xl mx-auto">
-            <div class="w-20 h-20 bg-primary rounded-xl flex items-center justify-center mx-auto mb-5">
-                <i class="fas fa-heartbeat text-white text-3xl"></i>
-            </div>
-
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">DocTime</h1>
-            <p class="text-lg md:text-xl text-gray-600 mb-8">
-                Connect with verified doctors and manage your health appointments
-            </p>
-
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('login') }}" 
-                   class="bg-primary text-black-500 font-medium py-3 px-8 rounded-lg hover:bg-primary-dark transition-colors text-base">
-                    Sign In
-                </a>
-                <a href="{{ route('register') }}" 
-                   class="border-2 border-primary text-primary font-medium py-3 px-8 rounded-lg hover:bg-primary hover:text-white transition-colors text-base">
-                    Get Started
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="py-16 px-4 bg-white">
-        <div class="max-w-5xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">How It Works</h2>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <!-- For Patients -->
-                <div class="bg-primary-bg p-6 rounded-lg text-center">
-                    <div class="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-user text-white text-2xl"></i>
+<body class="bg-gradient-to-br from-primary-50 to-white font-sans">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-sm shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-heartbeat text-white text-xl"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-primary-600">DocTime</h1>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">For Patients</h3>
-                    <p class="text-gray-600 text-base">
-                        Find verified doctors and book appointments easily.
-                    </p>
+                    
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 font-medium">
+                            Dashboard
+                        </a>
+                    @else
+                        <div class="flex space-x-3">
+                            <a href="{{ route('login') }}" class="px-6 py-2 text-primary-600 hover:text-primary-700 font-medium">
+                                Login
+                            </a>
+                            <a href="{{ route('register') }}" class="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 font-medium">
+                                Get Started
+                            </a>
+                        </div>
+                    @endauth
                 </div>
+            </div>
+        </header>
 
-                <!-- For Doctors -->
-                <div class="bg-primary-bg p-6 rounded-lg text-center">
-                    <div class="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-user-md text-white text-2xl"></i>
+        <!-- Hero Section -->
+        <main class="flex-1 flex items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div class="text-center">
+                    <div class="mb-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+                            <i class="fas fa-heartbeat text-white text-3xl"></i>
+                        </div>
+                        <h1 class="text-5xl font-bold text-gray-900 mb-6">
+                            Your Health, <span class="text-primary-500">Simplified</span>
+                        </h1>
+                        <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                            Connect with verified doctors, book appointments easily, and manage your healthcare journey all in one place.
+                        </p>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">For Doctors</h3>
-                    <p class="text-gray-600 text-base">
-                        Manage chambers and schedule appointments.
-                    </p>
-                </div>
 
-                <!-- For Admins -->
-                <div class="bg-primary-bg p-6 rounded-lg text-center">
-                    <div class="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-cog text-white text-2xl"></i>
+                    @guest
+                        <div class="flex justify-center space-x-4 mb-12">
+                            <a href="{{ route('register') }}?role=patient" class="px-8 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 font-semibold text-lg transition duration-200">
+                                <i class="fas fa-user mr-2"></i>Register as Patient
+                            </a>
+                            <a href="{{ route('register') }}?role=doctor" class="px-8 py-3 bg-white text-primary-600 border-2 border-primary-500 rounded-lg hover:bg-primary-50 font-semibold text-lg transition duration-200">
+                                <i class="fas fa-user-md mr-2"></i>Register as Doctor
+                            </a>
+                        </div>
+                    @endguest
+
+                    <!-- Features -->
+                    <div class="grid md:grid-cols-3 gap-8 mt-16">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-primary-100 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                                <i class="fas fa-search text-primary-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Find Doctors</h3>
+                            <p class="text-gray-600">Search and connect with verified healthcare professionals in your area.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-primary-100 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-primary-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Easy Booking</h3>
+                            <p class="text-gray-600">Book appointments with just a few clicks and manage your schedule.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-primary-100 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                                <i class="fas fa-shield-alt text-primary-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Secure & Reliable</h3>
+                            <p class="text-gray-600">Your health data is protected with enterprise-grade security.</p>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">For Admins</h3>
-                    <p class="text-gray-600 text-base">
-                        Oversee the platform and verify doctors.
-                    </p>
                 </div>
             </div>
-        </div>
-    </section>
+        </main>
 
-    <!-- Stats Section -->
-    <section class="py-12 px-4 bg-gray-50">
-        <div class="max-w-5xl mx-auto">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div class="text-center">
-                    <div class="text-3xl md:text-4xl font-bold text-primary mb-2">500+</div>
-                    <div class="text-gray-600 text-sm md:text-base">Verified Doctors</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl md:text-4xl font-bold text-primary mb-2">10K+</div>
-                    <div class="text-gray-600 text-sm md:text-base">Happy Patients</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl md:text-4xl font-bold text-primary mb-2">50K+</div>
-                    <div class="text-gray-600 text-sm md:text-base">Appointments</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl md:text-4xl font-bold text-primary mb-2">99%</div>
-                    <div class="text-gray-600 text-sm md:text-base">Satisfaction</div>
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="text-center text-gray-500">
+                    <p>&copy; {{ date('Y') }} DocTime. All rights reserved.</p>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 py-8 px-4 text-center">
-        <div class="max-w-5xl mx-auto">
-            <div class="text-xl font-bold mb-3 text-gray-900">
-                <i class="fas fa-heartbeat text-primary mr-2"></i>DocTime
-            </div>
-            <p class="text-gray-600 text-sm mb-4">Your trusted healthcare partner</p>
-
-            <div class="flex justify-center gap-3 mb-4">
-                <a href="#" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-colors">
-                    <i class="fab fa-facebook-f text-sm"></i>
-                </a>
-                <a href="#" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-colors">
-                    <i class="fab fa-twitter text-sm"></i>
-                </a>
-                <a href="#" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-colors">
-                    <i class="fab fa-linkedin-in text-sm"></i>
-                </a>
-                <a href="#" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-colors">
-                    <i class="fab fa-instagram text-sm"></i>
-                </a>
-            </div>
-
-            <p class="text-gray-500 text-sm">© {{ date('Y') }} DocTime. All rights reserved.</p>
-        </div>
-    </footer>
+        </footer>
+    </div>
 </body>
-
 </html>

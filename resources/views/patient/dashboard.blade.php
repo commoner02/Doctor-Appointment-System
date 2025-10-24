@@ -3,207 +3,95 @@
 @section('title', 'Patient Dashboard')
 
 @section('content')
-    <div class="container-fluid">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Welcome back, {{ auth()->user()->name }}!</h1>
-            <p class="page-subtitle">Manage your health appointments and find the best doctors</p>
+    <div class="space-y-6">
+        <!-- Welcome Section -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Welcome back, {{ auth()->user()->name }}!</h1>
+            <p class="text-gray-600">Manage your appointments and healthcare journey.</p>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">{{ $upcomingAppointments->count() }}</h3>
-                            <p class="mb-0 opacity-75">Upcoming Appointments</p>
-                        </div>
-                        <i class="fas fa-calendar-check fa-2x opacity-75"></i>
+        <!-- Stats -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-primary-100 rounded-lg">
+                        <i class="fas fa-calendar-check text-primary-600 text-xl"></i>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card success">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">{{ auth()->user()->patient->appointments->count() }}</h3>
-                            <p class="mb-0 opacity-75">Total Appointments</p>
-                        </div>
-                        <i class="fas fa-history fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card info">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1">Active</h3>
-                            <p class="mb-0 opacity-75">Profile Status</p>
-                        </div>
-                        <i class="fas fa-user-check fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Upcoming Appointments -->
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Appointments</h5>
-                        <a href="{{ route('patient.appointments') }}" class="btn btn-sm btn-outline-primary">View All</a>
-                    </div>
-                    <div class="card-body">
-                        @if($upcomingAppointments->count() > 0)
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Doctor</th>
-                                            <th>Date & Time</th>
-                                            <th>Location</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($upcomingAppointments as $appointment)
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar-circle me-3"
-                                                            style="width: 40px; height: 40px; background: #e0e7ff; color: #3730a3;">
-                                                            {{ substr($appointment->doctor->first_name, 0, 1) }}
-                                                        </div>
-                                                        <div>
-                                                            <strong>Dr. {{ $appointment->doctor->first_name }}
-                                                                {{ $appointment->doctor->last_name }}</strong>
-                                                            <br><small
-                                                                class="text-muted">{{ $appointment->doctor->speciality }}</small>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <strong>{{ $appointment->appointment_date->format('M d, Y') }}</strong>
-                                                    <br><small
-                                                        class="text-muted">{{ $appointment->appointment_date->format('h:i A') }}</small>
-                                                </td>
-                                                <td>{{ $appointment->chamber->chamber_name }}</td>
-                                                <td>
-                                                    <span
-                                                        class="badge bg-warning">{{ ucfirst($appointment->appointment_status) }}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="text-center py-5">
-                                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No upcoming appointments</h5>
-                                <p class="text-muted">Book your first appointment to get started</p>
-                                <a href="{{ route('patient.doctors') }}" class="btn btn-primary">Find Doctors</a>
-                            </div>
-                        @endif
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Total Appointments</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $totalAppointments }}</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-lg">
+                        <i class="fas fa-clock text-blue-600 text-xl"></i>
                     </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-3">
-                            <a href="{{ route('patient.doctors') }}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-search me-2"></i>Find Doctors
-                            </a>
-                            <a href="{{ route('patient.appointments') }}" class="btn btn-outline-primary btn-lg">
-                                <i class="fas fa-list me-2"></i>View All Appointments
-                            </a>
-                            <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary btn-lg">
-                                <i class="fas fa-user-edit me-2"></i>Edit Profile
-                            </a>
-                        </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Upcoming</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $upcomingAppointments->count() }}</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Health Tips -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Health Tips</h5>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Quick Book</p>
+                        <a href="{{ route('patient.doctors') }}"
+                            class="text-primary-600 hover:text-primary-700 font-medium">
+                            Find Doctors →
+                        </a>
                     </div>
-                    <div class="card-body">
-                        <div class="health-tip">
-                            <i class="fas fa-heart text-danger me-2"></i>
-                            <small>Regular check-ups help prevent health issues</small>
-                        </div>
-                        <hr class="my-3">
-                        <div class="health-tip">
-                            <i class="fas fa-dumbbell text-success me-2"></i>
-                            <small>Stay active with 30 minutes of exercise daily</small>
-                        </div>
-                        <hr class="my-3">
-                        <div class="health-tip">
-                            <i class="fas fa-apple-alt text-warning me-2"></i>
-                            <small>Eat a balanced diet with fruits and vegetables</small>
-                        </div>
+                    <div class="p-3 bg-green-100 rounded-lg">
+                        <i class="fas fa-user-md text-green-600 text-xl"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- All Appointments -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">All Appointments</h5>
-                    </div>
-                    <div class="card-body">
-                        @if($appointments->count() > 0)
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Doctor</th>
-                                            <th>Date</th>
-                                            <th>Chamber</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($appointments as $appointment)
-                                            <tr>
-                                                <td>Dr. {{ $appointment->doctor->user->name }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y H:i') }}
-                                                </td>
-                                                <td>{{ $appointment->chamber->chamber_name }}</td>
-                                                <td>
-                                                    <span
-                                                        class="badge bg-{{ $appointment->appointment_status == 'scheduled' ? 'warning' : ($appointment->appointment_status == 'completed' ? 'success' : 'danger') }}">
-                                                        {{ ucfirst($appointment->appointment_status) }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('appointments.show', $appointment) }}"
-                                                        class="btn btn-sm btn-info">View</a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+        <!-- Upcoming Appointments -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Upcoming Appointments</h2>
+            </div>
+            <div class="p-6">
+                @if($upcomingAppointments->count() > 0)
+                    <div class="space-y-4">
+                        @foreach($upcomingAppointments as $appointment)
+                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user-md text-primary-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900">Dr. {{ $appointment->doctor->user->name }}</h3>
+                                        <p class="text-sm text-gray-600">{{ $appointment->doctor->speciality ?? 'General' }}</p>
+                                        <p class="text-sm text-gray-500">
+                                            {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y') }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Scheduled
+                                    </span>
+                                </div>
                             </div>
-                        @else
-                            <p class="text-center text-muted">No appointments found</p>
-                        @endif
+                        @endforeach
                     </div>
-                </div>
+                @else
+                    <div class="text-center py-8">
+                        <i class="fas fa-calendar-times text-gray-400 text-3xl mb-4"></i>
+                        <p class="text-gray-600 mb-4">No upcoming appointments</p>
+                        <a href="{{ route('patient.doctors') }}"
+                            class="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600">
+                            <i class="fas fa-plus mr-2"></i>Book Appointment
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

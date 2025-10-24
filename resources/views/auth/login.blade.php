@@ -1,228 +1,90 @@
-@extends('layouts.guest')
 
-@section('content')
-    <div class="min-vh-100 d-flex align-items-center justify-content-center bg-gradient">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-6 col-lg-5">
-                    <!-- Logo Section -->
-                    <div class="text-center mb-5">
-                        <div class="logo-container mb-4">
-                            <i class="fas fa-heartbeat logo-icon"></i>
-                        </div>
-                        <h2 class="fw-bold text-white mb-2">HealthCare+</h2>
-                        <p class="text-white-50">Your health, our priority</p>
-                    </div>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Login - DocTime</title>
+    
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#20b2aa',
+                            600: '#0d9488',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-4">
+        <!-- Logo/Brand -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-primary-500">DocTime</h1>
+            <p class="text-gray-600 mt-2">Healthcare Management System</p>
+        </div>
 
-                    <!-- Login Card -->
-                    <div class="card login-card">
-                        <div class="card-body p-5">
-                            <div class="text-center mb-4">
-                                <h4 class="fw-bold text-dark">Welcome Back</h4>
-                                <p class="text-muted">Sign in to your account</p>
-                            </div>
-
-                            @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul class="mb-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
-
-                            <form method="POST" action="{{ route('login') }}">
-                                @csrf
-
-                                <!-- Email Field -->
-                                <div class="mb-4">
-                                    <label for="email" class="form-label fw-semibold">Email Address</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-envelope text-muted"></i>
-                                        </span>
-                                        <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                            id="email" name="email" value="{{ old('email') }}"
-                                            placeholder="Enter your email" required autofocus>
-                                    </div>
-                                    @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-
-                                <!-- Password Field -->
-                                <div class="mb-4">
-                                    <label for="password" class="form-label fw-semibold">Password</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-lock text-muted"></i>
-                                        </span>
-                                        <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                            id="password" name="password" placeholder="Enter your password" required>
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    @error('password')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-
-                                <!-- Remember Me -->
-                                <div class="mb-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                                        <label class="form-check-label" for="remember">
-                                            Remember me
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Login Button -->
-                                <div class="d-grid mb-4">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
-                                    </button>
-                                </div>
-
-                                <!-- Register Link -->
-                                <div class="text-center">
-                                    <p class="text-muted mb-0">
-                                        Don't have an account?
-                                        <a href="{{ route('register') }}" class="text-decoration-none fw-semibold">
-                                            Create one here
-                                        </a>
-                                    </p>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="text-center mt-4">
-                        <p class="text-white-50 small">
-                            © {{ date('Y') }} HealthCare+. All rights reserved.
-                        </p>
-                    </div>
+        <!-- Login Form -->
+        <div class="bg-white rounded-lg shadow-sm p-8">
+            <h2 class="text-2xl font-bold text-gray-900 text-center mb-6">Sign In</h2>
+            
+            <!-- Session Status -->
+            @if (session('status'))
+                <div class="mb-4 text-sm text-green-600 bg-green-50 p-3 rounded">
+                    {{ session('status') }}
                 </div>
-            </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" class="space-y-4">
+                @csrf
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    @error('email')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input id="password" type="password" name="password" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    @error('password')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Sign In Button -->
+                <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                    Sign In
+                </button>
+
+                <!-- Links -->
+                <div class="text-center space-y-2 text-sm">
+                    <p class="text-gray-600">
+                        Don't have an account? 
+                        <a href="{{ route('register') }}" class="text-primary-500 hover:text-primary-600 font-medium">Sign up</a>
+                    </p>
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="text-gray-500 hover:text-gray-700">
+                            Forgot password?
+                        </a>
+                    @endif
+                </div>
+            </form>
         </div>
     </div>
-
-    <style>
-        .bg-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .logo-container {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .logo-icon {
-            font-size: 2.5rem;
-            color: white;
-        }
-
-        .login-card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
-        .input-group-text {
-            background: transparent;
-            border: 2px solid #e9ecef;
-            border-right: none;
-            border-radius: 12px 0 0 12px;
-        }
-
-        .input-group .form-control {
-            border-left: none;
-            border-radius: 0 12px 12px 0;
-        }
-
-        .input-group .form-control:focus {
-            border-left: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .form-check-input:checked {
-            background-color: #667eea;
-            border-color: #667eea;
-        }
-
-        .text-decoration-none:hover {
-            color: #667eea !important;
-        }
-
-        @media (max-width: 768px) {
-            .login-card {
-                margin: 1rem;
-            }
-
-            .card-body {
-                padding: 2rem !important;
-            }
-        }
-    </style>
-
-    <script>
-        document.getElementById('togglePassword').addEventListener('click', function () {
-            const password = document.getElementById('password');
-            const icon = this.querySelector('i');
-
-            if (password.type === 'password') {
-                password.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                password.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-    </script>
-@endsection
+</body>
+</html>

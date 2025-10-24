@@ -1,24 +1,21 @@
-<footer class="bg-white border-top mt-4">
-    <div class="container-fluid px-4">
-        <div class="row py-4">
-            <!-- Brand Section -->
-            <div class="col-md-6 mb-3 mb-md-0">
-                <div class="d-flex align-items-center mb-2">
-                    <div class="footer-logo me-2">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    <h6 class="text-primary fw-bold mb-0">DocTime</h6>
+<footer class="bg-white border-t border-gray-200 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-heartbeat text-white"></i>
                 </div>
-                <p class="text-muted mb-0 small">Your trusted healthcare partner</p>
+                <div>
+                    <h3 class="font-semibold text-primary-600">DocTime</h3>
+                    <p class="text-sm text-gray-500">Your healthcare partner</p>
+                </div>
             </div>
-
-            <!-- Copyright -->
-            <div class="col-md-6 text-md-end">
-                <p class="text-muted mb-0 small">© {{ date('Y') }} DocTime. All rights reserved.</p>
-                <div class="mt-1">
-                    <a href="#" class="text-muted text-decoration-none small me-3">Privacy</a>
-                    <a href="#" class="text-muted text-decoration-none small me-3">Terms</a>
-                    <a href="#" class="text-muted text-decoration-none small">Support</a>
+            <div class="text-right">
+                <p class="text-sm text-gray-500">© {{ date('Y') }} DocTime. All rights reserved.</p>
+                <div class="mt-1 space-x-4 text-xs text-gray-400">
+                    <a href="#" class="hover:text-primary-500">Privacy</a>
+                    <a href="#" class="hover:text-primary-500">Terms</a>
+                    <a href="#" class="hover:text-primary-500">Support</a>
                 </div>
             </div>
         </div>

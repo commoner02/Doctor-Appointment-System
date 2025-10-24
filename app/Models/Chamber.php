@@ -10,20 +10,20 @@ class Chamber extends Model
 
     protected $fillable = [
         'doctor_id',
-        'chamber_name',
-        'chamber_location',
+        'name',
+        'address',
         'phone',
-        'start_time',
-        'end_time',
-        'visiting_fee',
-        'working_days'
+        'visiting_hours',
+        'fee',
+        'is_active',
     ];
 
-    protected $casts = [
-        'start_time' => 'datetime:H:i',
-        'end_time' => 'datetime:H:i',
-        'visiting_fee' => 'decimal:2'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
+    }
 
     // Relationships
     public function doctor()
@@ -34,11 +34,5 @@ class Chamber extends Model
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
-    }
-
-    // Helper to get working days as array
-    public function getWorkingDaysArray()
-    {
-        return explode(',', $this->working_days);
     }
 }

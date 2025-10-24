@@ -3,75 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Doctor;
+use App\Models\Chamber;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
-    public function __construct()
-    {
-        $this->doctor = auth()->user()->doctor;
-    }
-
     public function dashboard()
     {
-        if (auth()->user()->role !== 'doctor') {
-            abort(403, 'Unauthorized access');
-        }
-
         $doctor = auth()->user()->doctor;
 
-        // Get all appointments (scheduled, completed, cancelled)
-        $upcomingAppointments = Appointment::where('doctor_id', $doctor->id)
-            ->orderBy('appointment_date', 'desc')
-            ->with(['patient', 'chamber'])
-            ->get();
+        if (!$doctor) {
+            Doctor::create(['user_id' => auth()->id()]);
+            $doctor = auth()->user()->doctor;
+        }
 
         $todayAppointments = Appointment::where('doctor_id', $doctor->id)
             ->whereDate('appointment_date', today())
+            ->with(['patient.user'])
             ->get();
 
-        $specialities = Doctor::distinct()->pluck('speciality');
-
         $totalAppointments = Appointment::where('doctor_id', $doctor->id)->count();
+        $totalChambers = Chamber::where('doctor_id', $doctor->id)->count();
 
-        $completedAppointments = Appointment::where('doctor_id', $doctor->id)
-            ->where('appointment_status', 'completed')
-            ->count();
-
-        return view('doctor.dashboard', compact(
-            'upcomingAppointments',
-            'todayAppointments',
-            'totalAppointments',
-            'specialities',
-            'completedAppointments'
-        ));
-    }
-
-    public function show($id)
-    {
-        $doctor = Doctor::with(['user', 'chambers'])->findOrFail($id);
-        
-        return view('doctor.show', compact('doctor'));
-    }
-
-    public function appointments()
-    {
-        return view('doctor.appointments');
+        return view('doctor.dashboard', compact('todayAppointments', 'totalAppointments', 'totalChambers'));
     }
 
     public function chambers()
     {
-        return view('doctor.chambers');
+        $doctor = auth()->user()->doctor;
+
+        if (!$doctor) {
+            Doctor::create(['user_id' => auth()->id()]);
+            $doctor = auth()->user()->doctor;
+        }
+
+        $chambers = Chamber::where('doctor_id', $doctor->id)->get();
+
+        return view('doctor.chambers', compact('chambers'));
     }
 
-    public function browse()
+    public function appointments()
     {
-        return view('doctor.browse');
+        $doctor = auth()->user()->doctor;
+
+        if (!$doctor) {
+            Doctor::create(['user_id' => auth()->id()]);
+            $doctor = auth()->user()->doctor;
+        }
+
+        $appointments = Appointment::where('doctor_id', $doctor->id)
+            ->with(['patient.user', 'chamber'])
+            ->orderBy('appointment_date', 'desc')
+            ->paginate(10);
+
+        return view('doctor.appointments', compact('appointments'));
     }
 
-    public function pendingVerification()
+    public function show(Doctor $doctor)
     {
-        return view('doctor.pending-verification');
+        $doctor->load(['user', 'chambers']);
+        return view('doctor.show', compact('doctor'));
     }
 }

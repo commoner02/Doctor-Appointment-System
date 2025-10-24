@@ -11,25 +11,27 @@ class Patient extends Model
 
     protected $fillable = [
         'user_id',
-        'first_name',
-        'last_name',
-        'gender',
         'phone',
-        'date_of_birth',
-        'blood_group',
         'address',
+        'date_of_birth',
+        'gender',
+        'emergency_contact',
     ];
 
-    protected $casts = [
-        'date_of_birth' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'date_of_birth' => 'date',
+        ];
+    }
 
-    //Relationships
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function appointments(){
+    public function appointments()
+    {
         return $this->hasMany(Appointment::class);
     }
 }
