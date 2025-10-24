@@ -37,7 +37,7 @@
 
                 <div>
                     <label for="chamber_id" class="block text-sm font-medium text-gray-700 mb-2">Select Chamber</label>
-                    <select id="chamber_id" name="chamber_id"
+                    <select id="chamber_id" name="chamber_id" required
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         <option value="">Select a chamber</option>
                         @foreach($chambers as $chamber)
