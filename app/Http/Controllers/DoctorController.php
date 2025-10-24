@@ -10,7 +10,7 @@ class DoctorController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->doctor = auth()->user()->doctor;
     }
 
     public function dashboard()
@@ -20,34 +20,58 @@ class DoctorController extends Controller
         }
 
         $doctor = auth()->user()->doctor;
-        
+
         // Get all appointments (scheduled, completed, cancelled)
         $upcomingAppointments = Appointment::where('doctor_id', $doctor->id)
             ->orderBy('appointment_date', 'desc')
             ->with(['patient', 'chamber'])
             ->get();
-        
+
         $todayAppointments = Appointment::where('doctor_id', $doctor->id)
             ->whereDate('appointment_date', today())
             ->get();
-        
+
+        $specialities = Doctor::distinct()->pluck('speciality');
+
         $totalAppointments = Appointment::where('doctor_id', $doctor->id)->count();
-        
+
         $completedAppointments = Appointment::where('doctor_id', $doctor->id)
             ->where('appointment_status', 'completed')
             ->count();
-        
+
         return view('doctor.dashboard', compact(
             'upcomingAppointments',
             'todayAppointments',
             'totalAppointments',
+            'specialities',
             'completedAppointments'
         ));
     }
 
     public function show($id)
     {
-        $doctor = Doctor::with('user')->findOrFail($id);
-        return view('doctors.show', compact('doctor'));
+        $doctor = Doctor::with(['user', 'chambers'])->findOrFail($id);
+        
+        return view('doctor.show', compact('doctor'));
+    }
+
+    public function appointments()
+    {
+        return view('doctor.appointments');
+    }
+
+    public function chambers()
+    {
+        return view('doctor.chambers');
+    }
+
+    public function browse()
+    {
+        return view('doctor.browse');
+    }
+
+    public function pendingVerification()
+    {
+        return view('doctor.pending-verification');
     }
 }
