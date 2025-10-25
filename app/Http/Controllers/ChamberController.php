@@ -32,7 +32,9 @@ class ChamberController extends Controller
             'name' => 'required|string|max:255',
             'address' => 'required|string',
             'phone' => 'nullable|string|max:20',
-            'visiting_hours' => 'nullable|string|max:255',
+            'working_days' => 'nullable|string|max:255',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
             'fee' => 'nullable|numeric|min:0',
         ]);
 
@@ -46,7 +48,9 @@ class ChamberController extends Controller
             'name' => $request->name,
             'address' => $request->address,
             'phone' => $request->phone,
-            'visiting_hours' => $request->visiting_hours,
+            'working_days' => $request->working_days,
+            'start_time' => $request->start_time ?: '09:00',
+            'end_time' => $request->end_time ?: '17:00',
             'fee' => $request->fee,
             'is_active' => true,
         ]);
@@ -75,11 +79,13 @@ class ChamberController extends Controller
             'name' => 'required|string|max:255',
             'address' => 'required|string',
             'phone' => 'nullable|string|max:20',
-            'visiting_hours' => 'nullable|string|max:255',
+            'working_days' => 'nullable|string|max:255', // Changed from visiting_hours
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
             'fee' => 'nullable|numeric|min:0',
         ]);
 
-        $chamber->update($request->only(['name', 'address', 'phone', 'visiting_hours', 'fee']));
+        $chamber->update($request->only(['name', 'address', 'phone', 'working_days', 'start_time', 'end_time', 'fee'])); // Updated fields
 
         return redirect()->route('doctor.chambers')->with('success', 'Chamber updated successfully!');
     }

@@ -26,8 +26,8 @@
 
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <i class="fas fa-clinic-medical text-blue-600 text-xl"></i>
+                    <div class="p-3 bg-primary-100 rounded-lg">
+                        <i class="fas fa-clinic-medical text-primary-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">My Chambers</p>
@@ -38,8 +38,8 @@
 
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-green-100 rounded-lg">
-                        <i class="fas fa-clock text-green-600 text-xl"></i>
+                    <div class="p-3 bg-primary-100 rounded-lg">
+                        <i class="fas fa-clock text-primary-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Today's Appointments</p>
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <!-- Today's Appointments -->
+        <!-- Today's Appointments Table -->
         <div class="bg-white rounded-lg shadow-sm">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h2 class="text-lg font-semibold text-gray-900">Today's Appointments</h2>
@@ -60,31 +60,51 @@
             </div>
             <div class="p-6">
                 @if($todayAppointments->count() > 0)
-                    <div class="space-y-4">
-                        @foreach($todayAppointments as $appointment)
-                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user text-blue-600"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-semibold text-gray-900">{{ $appointment->patient->user->name }}</h3>
-                                        <p class="text-sm text-gray-600">{{ $appointment->appointment_time ?? 'Time TBD' }}</p>
-                                        @if($appointment->chamber)
-                                            <p class="text-sm text-gray-500">{{ $appointment->chamber->name }}</p>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <button class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200">
-                                        Complete
-                                    </button>
-                                    <button class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        @endforeach
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-primary-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-primary-700 uppercase">Date</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-primary-700 uppercase">Chamber</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-primary-700 uppercase">Patient</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-primary-700 uppercase">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($todayAppointments as $appointment)
+                                                    <tr class="hover:bg-primary-50">
+                                                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                                                            {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y') }}
+                                                        </td>
+                                                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                                                            @if($appointment->chamber)
+                                                                {{ $appointment->chamber->name }} ({{ $appointment->chamber->start_time }} -
+                                                                {{ $appointment->chamber->end_time }})
+                                                            @else
+                                                                N/A
+                                                            @endif
+                                                        </td>
+                                                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                                                            {{ $appointment->patient->user->name ?? 'N/A' }}
+                                                        </td>
+                                                        <td class="px-4 py-2 whitespace-nowrap">
+                                                            @php
+                                                                $status = $appointment->status ?? 'scheduled';
+                                                                $statusColors = [
+                                                                    'scheduled' => 'bg-yellow-100 text-yellow-800',
+                                                                    'completed' => 'bg-green-100 text-green-800',
+                                                                    'cancelled' => 'bg-red-100 text-red-800'
+                                                                ];
+                                                            @endphp
+                                     <span
+                                                                class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium {{ $statusColors[$status] ?? $statusColors['scheduled'] }}">
+                                                                {{ ucfirst($status) }}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 @else
                     <div class="text-center py-8">
@@ -92,45 +112,6 @@
                         <p class="text-gray-600 mb-4">No appointments scheduled for today</p>
                     </div>
                 @endif
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Manage Chambers</h3>
-                        <p class="text-gray-600 text-sm">Add or update your practice locations</p>
-                    </div>
-                    <div class="p-3 bg-primary-100 rounded-lg">
-                        <i class="fas fa-clinic-medical text-primary-600 text-xl"></i>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <a href="{{ route('doctor.chambers') }}"
-                        class="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                        Manage Chambers →
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">View Profile</h3>
-                        <p class="text-gray-600 text-sm">Update your professional information</p>
-                    </div>
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <i class="fas fa-user-md text-blue-600 text-xl"></i>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <a href="{{ route('profile.edit') }}"
-                        class="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                        Edit Profile →
-                    </a>
-                </div>
             </div>
         </div>
     </div>

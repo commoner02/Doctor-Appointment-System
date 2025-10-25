@@ -10,31 +10,45 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Appointment;
 
-class AppointmentBooked extends Mailable
+class AppointmentCancelled extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $appointment;
 
+    /**
+     * Create a new message instance.
+     */
     public function __construct(Appointment $appointment)
     {
         $this->appointment = $appointment;
     }
 
+    /**
+     * Get the message envelope.
+     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Appointment Booked - DocTime',
+            subject: 'Appointment Cancelled - DocTime',
         );
     }
 
+    /**
+     * Get the message content definition.
+     */
     public function content(): Content
     {
         return new Content(
-            view: 'emails.appointment-booked',
+            view: 'emails.appointment-cancelled',
         );
     }
 
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
     public function attachments(): array
     {
         return [];

@@ -65,47 +65,42 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium text-text-light uppercase tracking-wider">
                                     Doctor</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-text-light uppercase tracking-wider">
-                                    Date</th>
+                                    Chamber</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-text-light uppercase tracking-wider">
+                                    Working Days</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-text-light uppercase tracking-wider">
                                     Time</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-text-light uppercase tracking-wider">
-                                    Status</th>
+                                    Date</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-text-light uppercase tracking-wider">
-                                    Actions</th>
+                                    Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach($upcomingAppointments as $appointment)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-4 py-3 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                                                <i class="fas fa-user-md text-primary-600 text-sm"></i>
-                                            </div>
-                                            <div class="ml-3">
-                                                <div class="text-sm font-medium text-text-dark">Dr.
-                                                    {{ $appointment->doctor->user->name }}</div>
-                                                <div class="text-sm text-text-light">
-                                                    {{ $appointment->doctor->specialization ?? 'General' }}</div>
-                                            </div>
-                                        </div>
+                                        <div class="text-sm font-medium text-text-dark">Dr.
+                                            {{ $appointment->doctor->user->name }}</div>
+                                        <div class="text-sm text-text-light">
+                                            {{ $appointment->doctor->speciality ?? 'General' }}</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-text-dark">
+                                        {{ $appointment->chamber->name ?? 'N/A' }}
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-text-dark">
+                                        {{ $appointment->chamber->working_days ?? 'N/A' }}
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-text-dark">
+                                        {{ $appointment->chamber->start_time ?? 'N/A' }} - {{ $appointment->chamber->end_time ?? 'N/A' }}
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-text-dark">
                                         {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y') }}
-                                    </td>
-                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-text-dark">
-                                        {{ $appointment->appointment_time ?? 'TBD' }}
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap">
                                         <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
                                             {{ ucfirst($appointment->status) }}
                                         </span>
-                                    </td>
-                                    <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                        <a href="{{ route('patient.appointments', $appointment) }}"
-                                            class="text-primary-600 hover:text-primary-700 font-medium">
-                                            View
-                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

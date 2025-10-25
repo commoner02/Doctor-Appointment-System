@@ -53,6 +53,7 @@ class DoctorController extends Controller
         }
 
         $appointments = Appointment::where('doctor_id', $doctor->id)
+            ->whereHas('chamber') // Only include appointments with existing chambers
             ->with(['patient.user', 'chamber'])
             ->orderBy('appointment_date', 'desc')
             ->paginate(10);
