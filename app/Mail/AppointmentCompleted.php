@@ -15,12 +15,10 @@ class AppointmentCompleted extends Mailable
     use Queueable, SerializesModels;
 
     public $appointment;
-    public $doctorName;
 
-    public function __construct(Appointment $appointment, $doctorName)
+    public function __construct(Appointment $appointment)
     {
         $this->appointment = $appointment;
-        $this->doctorName = $doctorName;
     }
 
     public function envelope(): Envelope
@@ -34,10 +32,6 @@ class AppointmentCompleted extends Mailable
     {
         return new Content(
             view: 'emails.appointment-completed',
-            with: [
-                'appointment' => $this->appointment,
-                'doctorName' => $this->doctorName,
-            ],
         );
     }
 

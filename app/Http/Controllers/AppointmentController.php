@@ -63,9 +63,8 @@ class AppointmentController extends Controller
 
         // Send booked email to patient and doctor
         try {
-            Log::info('Sending booked email to patient: ' . $patient->user->email);
+    
             Mail::to($patient->user->email)->send(new AppointmentBooked($appointment));
-            Log::info('Sending booked email to doctor: ' . $appointment->doctor->user->email);
             Mail::to($appointment->doctor->user->email)->send(new AppointmentBooked($appointment));
         } catch (\Exception $e) {
             Log::error('Email sending failed: ' . $e->getMessage());
@@ -106,7 +105,7 @@ class AppointmentController extends Controller
 
         // Send emails based on status change
         if ($status === 'completed' && $oldStatus !== 'completed') {
-            Log::info('Sending completed email to: ' . $appointment->patient->user->email);
+    
             Mail::to($appointment->patient->user->email)->send(new AppointmentCompleted($appointment));
         } elseif ($status === 'cancelled' && $oldStatus !== 'cancelled') {
             Log::info('Sending cancelled email to: ' . $appointment->patient->user->email);
@@ -161,7 +160,7 @@ class AppointmentController extends Controller
         if (in_array($appointment->status, ['completed', 'cancelled'])) {
             return back()->with('error', 'Cannot edit completed or cancelled appointments.');
         }
-
+         
         $doctor = $appointment->doctor;
         $doctor->load('chambers');
 

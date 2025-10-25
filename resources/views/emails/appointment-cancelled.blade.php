@@ -56,7 +56,8 @@
             <p>Dear {{ $appointment->patient->user->name }},</p>
 
             <p>We regret to inform you that your appointment with {{ $appointment->doctor->user->name }} has been
-                cancelled.</p>
+                cancelled.
+            </p>
 
             <div class="appointment-details">
                 <h3>Cancelled Appointment Details:</h3>
