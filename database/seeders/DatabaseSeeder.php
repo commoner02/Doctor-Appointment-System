@@ -37,7 +37,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => 'Cardiology',
                 'qualifications' => 'MBBS, MD (Cardiology), FRCP',
                 'experience' => 15,
-                'bio' => 'Specialist in heart diseases and cardiac surgery with 15 years of experience.',
             ],
             [
                 'name' => 'Dr. Fatima Khatun',
@@ -45,7 +44,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => 'Gynecology & Obstetrics',
                 'qualifications' => 'MBBS, FCPS (Gynecology)',
                 'experience' => 12,
-                'bio' => 'Women\'s health specialist with expertise in pregnancy and reproductive health.',
             ],
             [
                 'name' => 'Dr. Abdul Karim',
@@ -53,7 +51,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => 'Orthopedics',
                 'qualifications' => 'MBBS, MS (Orthopedics)',
                 'experience' => 10,
-                'bio' => 'Bone and joint specialist, expert in fracture treatment and joint replacement.',
             ],
             [
                 'name' => 'Dr. Rashida Begum',
@@ -61,7 +58,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => 'Pediatrics',
                 'qualifications' => 'MBBS, DCH, FCPS (Pediatrics)',
                 'experience' => 8,
-                'bio' => 'Child specialist with expertise in newborn care and child development.',
             ],
             [
                 'name' => 'Dr. Mizanur Rahman',
@@ -69,7 +65,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => 'Internal Medicine',
                 'qualifications' => 'MBBS, FCPS (Medicine)',
                 'experience' => 20,
-                'bio' => 'General physician specializing in diabetes, hypertension, and chronic diseases.',
             ],
             [
                 'name' => 'Dr. Nasreen Akter',
@@ -77,7 +72,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => 'Dermatology',
                 'qualifications' => 'MBBS, DDV, MD (Dermatology)',
                 'experience' => 7,
-                'bio' => 'Skin specialist treating acne, eczema, psoriasis, and cosmetic procedures.',
             ],
             [
                 'name' => 'Dr. Shahidul Islam',
@@ -85,7 +79,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => 'Neurology',
                 'qualifications' => 'MBBS, FCPS (Neurology)',
                 'experience' => 14,
-                'bio' => 'Brain and nervous system specialist treating stroke, epilepsy, and headaches.',
             ],
             [
                 'name' => 'Dr. Salma Khatun',
@@ -93,7 +86,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => 'Ophthalmology',
                 'qualifications' => 'MBBS, DO, FCPS (Ophthalmology)',
                 'experience' => 9,
-                'bio' => 'Eye specialist performing cataract surgery and treating eye diseases.',
             ]
         ];
 
@@ -114,7 +106,6 @@ class DatabaseSeeder extends Seeder
                 'speciality' => $doctor_data['speciality'],
                 'qualifications' => $doctor_data['qualifications'],
                 'experience' => $doctor_data['experience'],
-                'bio' => $doctor_data['bio'],
                 'phone' => $user->phone,
                 'license_number' => 'BMA-' . rand(10000, 99999),
                 'verification_status' => 'verified',
@@ -123,24 +114,30 @@ class DatabaseSeeder extends Seeder
             $doctors[] = $doctor;
         }
 
-        // Bangladesh-specific chambers
+        // Bangladesh-specific chambers (updated to match migration)
         $chambers_data = [
             // Dr. Rahman (Cardiology)
             [
                 'doctor_id' => $doctors[0]->id,
                 'name' => 'Square Hospital Heart Center',
                 'address' => '18/F, Bir Uttam Qazi Nuruzzaman Sarak, West Panthapath, Dhaka 1205',
-                'phone' => '+88028144400',
-                'visiting_hours' => 'Sat-Thu: 4PM-8PM',
-                'fee' => 1500,
+                'phone' => '88028144400',
+                'fee' => 1500.00,
+                'is_active' => true,
+                'working_days' => 'Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday',
+                'start_time' => '16:00:00',
+                'end_time' => '20:00:00',
             ],
             [
                 'doctor_id' => $doctors[0]->id,
                 'name' => 'Ibn Sina Diagnostic Center',
                 'address' => 'House 48, Road 9/A, Dhanmondi, Dhaka 1209',
-                'phone' => '+88029661991',
-                'visiting_hours' => 'Fri: 10AM-2PM',
-                'fee' => 1200,
+                'phone' => '88029661991',
+                'fee' => 1200.00,
+                'is_active' => true,
+                'working_days' => 'Friday',
+                'start_time' => '14:00:00',
+                'end_time' => '18:00:00',
             ],
 
             // Dr. Fatima (Gynecology)
@@ -148,17 +145,23 @@ class DatabaseSeeder extends Seeder
                 'doctor_id' => $doctors[1]->id,
                 'name' => 'Dhaka Medical College Hospital',
                 'address' => 'Secretariat Road, Ramna, Dhaka 1000',
-                'phone' => '+8808631167',
-                'visiting_hours' => 'Sat-Wed: 9AM-1PM',
-                'fee' => 800,
+                'phone' => '88028631167',
+                'fee' => 800.00,
+                'is_active' => true,
+                'working_days' => 'Saturday,Sunday,Monday,Wednesday',
+                'start_time' => '14:00:00',
+                'end_time' => '18:00:00',
             ],
             [
                 'doctor_id' => $doctors[1]->id,
                 'name' => 'Birdem General Hospital',
                 'address' => '122 Kazi Nazrul Islam Avenue, Dhaka 1000',
-                'phone' => '+88028616641',
-                'visiting_hours' => 'Thu: 2PM-6PM',
-                'fee' => 1000,
+                'phone' => '88028616641',
+                'fee' => 1000.00,
+                'is_active' => true,
+                'working_days' => 'Tuesday,Thursday',
+                'start_time' => '15:00:00',
+                'end_time' => '19:00:00',
             ],
 
             // Dr. Karim (Orthopedics)
@@ -166,17 +169,23 @@ class DatabaseSeeder extends Seeder
                 'doctor_id' => $doctors[2]->id,
                 'name' => 'National Institute of Orthopedics',
                 'address' => 'Sher-E-Bangla Nagar, Dhaka 1207',
-                'phone' => '+88029181013',
-                'visiting_hours' => 'Sun-Thu: 10AM-2PM',
-                'fee' => 1200,
+                'phone' => '88029181013',
+                'fee' => 1200.00,
+                'is_active' => true,
+                'working_days' => 'Sunday,Monday,Tuesday,Wednesday,Thursday',
+                'start_time' => '14:00:00',
+                'end_time' => '18:00:00',
             ],
             [
                 'doctor_id' => $doctors[2]->id,
                 'name' => 'Bone & Joint Hospital',
                 'address' => 'Green Road, Panthapath, Dhaka 1205',
-                'phone' => '+88029661234',
-                'visiting_hours' => 'Sat: 3PM-7PM',
-                'fee' => 1500,
+                'phone' => '88029661234',
+                'fee' => 1500.00,
+                'is_active' => true,
+                'working_days' => 'Saturday',
+                'start_time' => '15:00:00',
+                'end_time' => '19:00:00',
             ],
 
             // Dr. Rashida (Pediatrics)
@@ -184,17 +193,23 @@ class DatabaseSeeder extends Seeder
                 'doctor_id' => $doctors[3]->id,
                 'name' => 'Dhaka Shishu Hospital',
                 'address' => 'Sher-E-Bangla Nagar, Dhaka 1207',
-                'phone' => '+88028118061',
-                'visiting_hours' => 'Sat-Thu: 8AM-12PM',
-                'fee' => 600,
+                'phone' => '88028118061',
+                'fee' => 600.00,
+                'is_active' => true,
+                'working_days' => 'Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday',
+                'start_time' => '14:00:00',
+                'end_time' => '18:00:00',
             ],
             [
                 'doctor_id' => $doctors[3]->id,
                 'name' => 'Apollo Hospitals Dhaka',
                 'address' => 'Plot 81, Block E, Bashundhara R/A, Dhaka 1229',
-                'phone' => '+88028401661',
-                'visiting_hours' => 'Fri: 2PM-6PM',
-                'fee' => 1000,
+                'phone' => '88028401661',
+                'fee' => 1000.00,
+                'is_active' => true,
+                'working_days' => 'Friday',
+                'start_time' => '15:00:00',
+                'end_time' => '19:00:00',
             ],
 
             // Dr. Mizan (Internal Medicine)
@@ -202,17 +217,23 @@ class DatabaseSeeder extends Seeder
                 'doctor_id' => $doctors[4]->id,
                 'name' => 'Bangabandhu Sheikh Mujib Medical University',
                 'address' => 'Shahbag, Dhaka 1000',
-                'phone' => '+88029661064',
-                'visiting_hours' => 'Sun-Thu: 9AM-1PM',
-                'fee' => 500,
+                'phone' => '88029661064',
+                'fee' => 500.00,
+                'is_active' => true,
+                'working_days' => 'Sunday,Monday,Tuesday,Wednesday,Thursday',
+                'start_time' => '14:00:00',
+                'end_time' => '18:00:00',
             ],
             [
                 'doctor_id' => $doctors[4]->id,
                 'name' => 'United Hospital Limited',
                 'address' => 'Plot 15, Road 71, Gulshan 2, Dhaka 1212',
-                'phone' => '+88028836000',
-                'visiting_hours' => 'Sat: 4PM-8PM',
-                'fee' => 2000,
+                'phone' => '88028836000',
+                'fee' => 2000.00,
+                'is_active' => true,
+                'working_days' => 'Saturday',
+                'start_time' => '16:00:00',
+                'end_time' => '20:00:00',
             ],
         ];
 
@@ -283,7 +304,7 @@ class DatabaseSeeder extends Seeder
             $patients[] = $patient;
         }
 
-        // Sample Appointments
+        // Sample Appointments with afternoon/evening times
         $chambers = Chamber::all();
 
         foreach ($patients as $index => $patient) {
@@ -300,19 +321,18 @@ class DatabaseSeeder extends Seeder
                     'doctor_id' => $doctor->id,
                     'chamber_id' => $chamber->id,
                     'appointment_date' => $appointmentDate->format('Y-m-d'),
-                    'appointment_time' => ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'][rand(0, 5)] . ':00',
                     'status' => $status,
-                    'fee' => $chamber->fee,
                     'payment_status' => $status === 'completed' ? 'paid' : 'pending',
+                    'reason' => $this->getRandomMedicalReason(),
                     'notes' => $this->getRandomMedicalNote(),
                 ]);
             }
         }
     }
 
-    private function getRandomMedicalNote(): string
+    private function getRandomMedicalReason(): string
     {
-        $notes = [
+        $reasons = [
             'Chest pain and shortness of breath for 3 days',
             'Fever and headache since yesterday',
             'Regular checkup for diabetes',
@@ -323,6 +343,24 @@ class DatabaseSeeder extends Seeder
             'Child vaccination - MMR',
             'High blood pressure monitoring',
             'Joint pain in knees',
+        ];
+
+        return $reasons[array_rand($reasons)];
+    }
+
+    private function getRandomMedicalNote(): string
+    {
+        $notes = [
+            'Visit again in 3 days for follow-up',
+            'Prescribed medication for 7 days, return if symptoms persist',
+            'Blood tests advised, come back with reports',
+            'Physical therapy recommended, follow-up in 2 weeks',
+            'Dietary changes advised, monitor blood pressure daily',
+            'Further investigation needed, schedule ultrasound',
+            'Patient educated about condition management',
+            'Vaccination completed, next dose in 1 month',
+            'X-ray advised for further diagnosis',
+            'Medication adjusted, monitor side effects',
         ];
 
         return $notes[array_rand($notes)];

@@ -3,32 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use App\Models\Patient;
 use App\Models\Doctor;
 use App\Models\Chamber;
+use App\Services\BrevoEmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\AppointmentBooked;
-use App\Mail\AppointmentCancelled;
-use App\Mail\AppointmentCompleted;
+use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
+    protected $brevoService;
+
+    public function __construct(BrevoEmailService $brevoService)
+    {
+        $this->brevoService = $brevoService;
+    }
+
     public function create(Doctor $doctor)
     {
-        $user = auth()->user();
-
-        if (!$user->isPatient()) {
-            abort(403, 'Unauthorized');
-        }
-
-        // Check if doctor is verified
-        if ($doctor->verification_status !== 'verified') {
-            return redirect()->back()->with('error', 'This doctor is not verified yet.');
-        }
-
-        // Get doctor's active chambers
         $chambers = Chamber::where('doctor_id', $doctor->id)
             ->where('is_active', true)
             ->get();
@@ -36,34 +28,29 @@ class AppointmentController extends Controller
         return view('appointments.create', compact('doctor', 'chambers'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Doctor $doctor)
     {
         $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
-            'chamber_id' => 'nullable|exists:chambers,id',
+            'chamber_id' => 'required|exists:chambers,id',
             'appointment_date' => 'required|date|after:today',
-            'appointment_time' => 'nullable|date_format:H:i',
-            'notes' => 'nullable|string|max:1000',
+            'reason' => 'nullable|string|max:500',
         ]);
 
         $appointment = Appointment::create([
-            'patient_id' => Auth::user()->patient->id,
+            'patient_id' => auth()->user()->patient->id,
             'doctor_id' => $request->doctor_id,
             'chamber_id' => $request->chamber_id,
             'appointment_date' => $request->appointment_date,
-            'appointment_time' => $request->appointment_time,
-            'status' => 'scheduled', // Default status
-            'payment_status' => 'pending', // Default payment status
-            'fee' => $request->fee ?? null,
-            'notes' => $request->notes,
+            'status' => 'scheduled',
+            'reason' => $request->reason,
         ]);
 
-        // Send booking confirmation email
-        $patientEmail = Auth::user()->email;
-        $doctorName = 'Dr. ' . $appointment->doctor->user->name;
-        Mail::to($patientEmail)->send(new AppointmentBooked($appointment, $doctorName));
+        // Send emails using Brevo API
+        $this->brevoService->sendAppointmentBooked($appointment);
 
-        return redirect()->route('patient.appointments')->with('success', 'Appointment booked successfully!');
+        return redirect()->route('appointments.show', $appointment)
+            ->with('success', 'Appointment booked successfully. Confirmation emails have been sent.');
     }
 
     public function myAppointments()
@@ -86,74 +73,53 @@ class AppointmentController extends Controller
 
     public function updateStatus(Request $request, Appointment $appointment)
     {
-        // Check if user is authorized to update this appointment
-        if (Auth::user()->role === 'doctor' && $appointment->doctor_id !== Auth::user()->doctor->id) {
-            abort(403, 'Unauthorized');
-        }
-
-        if (Auth::user()->role === 'patient' && $appointment->patient_id !== Auth::user()->patient->id) {
-            abort(403, 'Unauthorized');
-        }
-
         $request->validate([
             'status' => 'required|in:scheduled,completed,cancelled',
-            'payment_status' => 'nullable|in:pending,paid,cancelled',
-            'notes' => 'nullable|string|max:1000'
         ]);
 
         $oldStatus = $appointment->status;
-        $appointment->status = $request->status;
+        $appointment->update(['status' => $request->status]);
 
-        if ($request->filled('payment_status')) {
-            $appointment->payment_status = $request->payment_status;
+        // Send emails based on status change
+        if ($request->status === 'completed' && $oldStatus !== 'completed') {
+            $this->brevoService->sendAppointmentCompleted($appointment);
+        } elseif ($request->status === 'cancelled' && $oldStatus !== 'cancelled') {
+            $this->brevoService->sendAppointmentCancelled($appointment);
         }
 
-        if ($request->filled('notes')) {
-            $appointment->notes = $appointment->notes ?
-                $appointment->notes . "\n\n" . $request->notes :
-                $request->notes;
-        }
-
-        $appointment->save();
-
-        // Send email notifications based on status change
-        $this->sendStatusNotification($appointment, $oldStatus);
-
-        return redirect()->back()->with('success', 'Appointment updated successfully!');
-    }
-
-    private function sendStatusNotification(Appointment $appointment, $oldStatus)
-    {
-        // Only send emails for status changes (not payment status)
-        if ($appointment->status === $oldStatus) {
-            return;
-        }
-
-        $patientEmail = $appointment->patient->user->email;
-        $doctorName = 'Dr. ' . $appointment->doctor->user->name;
-
-        switch ($appointment->status) {
-            case 'scheduled':
-                // This would be sent when booking, handled in store method
-                break;
-            case 'completed':
-                Mail::to($patientEmail)->send(new AppointmentCompleted($appointment, $doctorName));
-                break;
-            case 'cancelled':
-                Mail::to($patientEmail)->send(new AppointmentCancelled($appointment, $doctorName));
-                break;
-        }
+        return redirect()->back()->with('success', 'Appointment status updated successfully.');
     }
 
     public function updatePayment(Request $request, Appointment $appointment)
     {
+        $doctor = Doctor::where('user_id', auth()->id())->firstOrFail();
+        if ($appointment->doctor_id !== $doctor->id) {
+            abort(403);
+        }
+
         $request->validate([
-            'payment_status' => 'required|in:paid,pending,cancelled'
+            'payment_status' => 'required|in:pending,paid,cancelled',
         ]);
 
         $appointment->update(['payment_status' => $request->payment_status]);
 
-        return back()->with('success', 'Payment status updated successfully!');
+        return back()->with('success', 'Payment status updated.');
+    }
+
+    public function updateNotes(Request $request, Appointment $appointment)
+    {
+        $doctor = Doctor::where('user_id', auth()->id())->firstOrFail();
+        if ($appointment->doctor_id !== $doctor->id) {
+            abort(403);
+        }
+
+        $request->validate([
+            'notes' => 'nullable|string|max:2000',
+        ]);
+
+        $appointment->update(['notes' => $request->notes]);
+
+        return back()->with('success', 'Notes updated.');
     }
 
     public function edit(Appointment $appointment)
@@ -225,6 +191,9 @@ class AppointmentController extends Controller
             'appointment_status' => 'cancelled',
             'updated_at' => now()
         ]);
+
+        // Send cancellation emails
+        $this->brevoService->sendAppointmentCancelled($appointment);
 
         return back()->with('success', 'Appointment cancelled successfully!');
     }
