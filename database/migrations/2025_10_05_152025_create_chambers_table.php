@@ -15,10 +15,12 @@ return new class extends Migration {
             $table->foreignId('doctor_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('address');
-            $table->string('phone')->nullable();
-            $table->string('visiting_hours')->nullable();
+            $table->string('phone')->nullable(); // Changed from decimal to string
             $table->decimal('fee', 8, 2)->nullable();
             $table->boolean('is_active')->default(true);
+            $table->string('working_days');
+            $table->time('start_time')->default('09:00');
+            $table->time('end_time')->default('17:00');
             $table->timestamps();
         });
     }

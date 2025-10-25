@@ -13,18 +13,24 @@ export default {
 
     theme: {
         extend: {
-            fontFamily: {
-                heading: ["Figtree", ...defaultTheme.fontFamily.sans],
-                sans: ["Figtree", ...defaultTheme.fontFamily.sans],
-            },
             colors: {
+                text: {
+                    light: "#6b7280", // Gray 500
+                    default: "#374151", // Gray 700
+                    dark: "#111827", // Gray 900
+                },
+                background: {
+                    light: "#FFFFFA", // Very light ivory
+                    default: "#FFFFF0", // Standard ivory
+                    dark: "#F5F5DC", // Dark ivory/beige
+                },
                 primary: {
                     50: "#f0fdfa",
                     100: "#ccfbf1",
                     200: "#99f6e4",
                     300: "#5eead4",
                     400: "#2dd4bf",
-                    500: "#20b2aa", // Your main Light Sea Green
+                    500: "#20b2aa", //Light Sea Green
                     600: "#0d9488",
                     700: "#0f766e",
                     800: "#115e59",

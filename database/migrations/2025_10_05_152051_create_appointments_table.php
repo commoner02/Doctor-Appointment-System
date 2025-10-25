@@ -13,12 +13,10 @@ return new class extends Migration {
             $table->foreignId('doctor_id')->constrained()->onDelete('cascade');
             $table->foreignId('chamber_id')->nullable()->constrained()->onDelete('set null');
             $table->date('appointment_date');
-            $table->time('appointment_time')->nullable();
             $table->enum('status', ['scheduled', 'completed', 'cancelled'])->default('scheduled');
-            $table->decimal('fee', 8, 2)->nullable();
             $table->enum('payment_status', ['pending', 'paid', 'cancelled'])->default('pending');
+            $table->text('reason')->nullable();
             $table->text('notes')->nullable();
-            $table->text('prescription')->nullable();
             $table->timestamps();
         });
     }

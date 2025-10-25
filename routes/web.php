@@ -67,6 +67,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{appointment}', [AppointmentController::class, 'update'])->name('update');
         Route::patch('/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('update-status');
         Route::patch('/{appointment}/payment', [AppointmentController::class, 'updatePayment'])->name('update-payment');
+        Route::patch('/{appointment}/notes', [AppointmentController::class, 'updateNotes'])->name('update-notes');
         Route::delete('/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
         Route::get('/', [AppointmentController::class, 'index'])->name('index');
     });
@@ -90,3 +91,31 @@ Route::get('/waiting', function () {
 Route::get('/doctor/pending-verification', function () {
     return view('doctor.pending-verification');
 })->name('doctor.pending-verification');
+
+// Admin specific routes
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/patients', [AdminController::class, 'patients'])->name('admin.patients');
+    Route::patch('/admin/patients/{user}/toggle-status', [AdminController::class, 'togglePatientStatus'])->name('admin.patients.toggle-status');
+    Route::get('/admin/doctors', [AdminController::class, 'doctors'])->name('admin.doctors');
+    Route::patch('/admin/doctors/{doctor}/verify', [AdminController::class, 'verifyDoctor'])->name('admin.doctors.verify');
+    Route::patch('/admin/doctors/{doctor}/reject', [AdminController::class, 'rejectDoctor'])->name('admin.doctors.reject');
+    Route::get('/admin/appointments', [AdminController::class, 'appointments'])->name('admin.appointments');
+    Route::get('/admin/chambers', [AdminController::class, 'chambers'])->name('admin.chambers');
+    Route::patch('/admin/chambers/{chamber}/toggle-status', [AdminController::class, 'toggleChamberStatus'])->name('admin.chambers.toggle-status');
+});
+
+// Temporary route for testing Brevo email service
+Route::get('/test-brevo', function () {
+    $service = app(\App\Services\BrevoEmailService::class);
+
+    // Create a dummy appointment for testing (replace with real IDs)
+    $appointment = \App\Models\Appointment::first();
+
+    if ($appointment) {
+        $result = $service->sendAppointmentBooked($appointment);
+        return $result ? 'Email sent successfully!' : 'Failed to send email.';
+    }
+
+    return 'No appointment found for testing.';
+});

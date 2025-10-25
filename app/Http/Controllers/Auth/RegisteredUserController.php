@@ -33,12 +33,11 @@ class RegisteredUserController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
-            'phone' => ['required', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:20'],
             'role' => ['required', 'string', 'in:patient,doctor'],
             'gender' => ['nullable', 'string', 'in:male,female,other'],
             'address' => ['nullable', 'string', 'max:500'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'terms' => ['required', 'accepted'],
         ];
 
         // Role-specific validation
@@ -46,15 +45,13 @@ class RegisteredUserController extends Controller
             $rules = array_merge($rules, [
                 'date_of_birth' => ['nullable', 'date', 'before:today'],
                 'blood_group' => ['nullable', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
-                'emergency_contact' => ['nullable', 'string', 'max:20'],
             ]);
         } elseif ($request->role === 'doctor') {
             $rules = array_merge($rules, [
-                'speciality' => ['required', 'string', 'max:255'],
-                'experience' => ['required', 'integer', 'min:0', 'max:50'],
-                'qualifications' => ['required', 'string', 'max:500'],
-                'license_number' => ['required', 'string', 'max:100', 'unique:doctors'],
-                'bio' => ['nullable', 'string', 'max:1000'],
+                'speciality' => ['nullable', 'string', 'max:255'],
+                'experience' => ['nullable', 'integer', 'min:0', 'max:50'],
+                'qualifications' => ['nullable', 'string', 'max:500'],
+                'license_number' => ['nullable', 'string', 'max:100', 'unique:doctors'],
             ]);
         }
 
@@ -64,47 +61,43 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
-            'phone' => $validatedData['phone'],
+            'phone' => $validatedData['phone'] ?? null,
             'role' => $validatedData['role'],
             'password' => Hash::make($validatedData['password']),
-            'status' => $validatedData['role'] === 'doctor' ? 'pending' : 'active', // Doctors need verification
         ]);
 
         // Create role-specific profile
         if ($user->role === 'patient') {
             Patient::create([
                 'user_id' => $user->id,
-                'phone' => $validatedData['phone'],
+                'phone' => $validatedData['phone'] ?? null,
                 'address' => $validatedData['address'] ?? null,
                 'date_of_birth' => $validatedData['date_of_birth'] ?? null,
                 'gender' => $validatedData['gender'] ?? null,
                 'blood_group' => $validatedData['blood_group'] ?? null,
-                'emergency_contact' => $validatedData['emergency_contact'] ?? null,
             ]);
 
             // Login patient immediately
             event(new Registered($user));
             Auth::login($user);
 
-            return redirect()->route('dashboard')->with('success', 'Account created successfully!');
+            return redirect()->route('dashboard')->with('status', 'Account created successfully!');
 
         } elseif ($user->role === 'doctor') {
             Doctor::create([
                 'user_id' => $user->id,
-                'speciality' => $validatedData['speciality'],
-                'experience' => $validatedData['experience'],
-                'qualifications' => $validatedData['qualifications'],
-                'license_number' => $validatedData['license_number'],
-                'bio' => $validatedData['bio'] ?? null,
-                'phone' => $validatedData['phone'],
+                'speciality' => $validatedData['speciality'] ?? null,
+                'experience' => $validatedData['experience'] ?? null,
+                'qualifications' => $validatedData['qualifications'] ?? null,
+                'license_number' => $validatedData['license_number'] ?? null,
+                'phone' => $validatedData['phone'] ?? null,
                 'verification_status' => 'pending',
             ]);
 
             event(new Registered($user));
 
-            // Don't login doctor - redirect to pending verification page
-            return redirect()->route('doctor.pending-verification')
-                ->with('success', 'Registration successful! Please wait for admin verification.');
+            // Redirect to login with message
+            return redirect()->route('login')->with('status', 'Registration successful! Please wait for admin verification.');
         }
 
         return redirect()->route('dashboard');
