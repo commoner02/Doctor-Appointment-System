@@ -21,7 +21,7 @@ class PatientController extends Controller
 
         $upcomingAppointments = Appointment::where('patient_id', $patient->id)
             ->where('appointment_date', '>=', now())
-            ->with(['doctor.user', 'chamber'])
+            ->with(['doctor.user', 'chamber']) // Chamber is already loaded
             ->orderBy('appointment_date', 'asc')
             ->limit(3)
             ->get();
@@ -67,7 +67,7 @@ class PatientController extends Controller
         }
 
         $appointments = Appointment::where('patient_id', $patient->id)
-            ->with(['doctor.user', 'chamber'])
+            ->with(['doctor.user', 'chamber']) // Ensure chamber is loaded
             ->orderBy('appointment_date', 'desc')
             ->paginate(10);
 

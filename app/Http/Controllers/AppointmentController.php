@@ -5,22 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Chamber;
-use App\Services\BrevoEmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\AppointmentBooked;
+use App\Mail\AppointmentCompleted;
+use App\Mail\AppointmentCancelled;
 use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
-    protected $brevoService;
-
-    public function __construct(BrevoEmailService $brevoService)
-    {
-        $this->brevoService = $brevoService;
-    }
+    // Removed BrevoEmailService dependency
 
     public function create(Doctor $doctor)
     {
+        // Ensure only patients can access
+        if (!auth()->check() || !auth()->user()->isPatient()) {
+            abort(403, 'Only patients can book appointments.');
+        }
+
         $chambers = Chamber::where('doctor_id', $doctor->id)
             ->where('is_active', true)
             ->get();
@@ -28,29 +32,47 @@ class AppointmentController extends Controller
         return view('appointments.create', compact('doctor', 'chambers'));
     }
 
-    public function store(Request $request, Doctor $doctor)
+    public function store(Request $request)
     {
         $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
             'chamber_id' => 'required|exists:chambers,id',
             'appointment_date' => 'required|date|after:today',
-            'reason' => 'nullable|string|max:500',
+            'notes' => 'nullable|string|max:500',
         ]);
 
+        $patient = Auth::user()->patient;
+        if (!$patient) {
+            return redirect()->back()->with('error', 'Patient profile not found.');
+        }
+
+        // Check if doctor owns the chamber
+        $chamber = Chamber::find($request->chamber_id);
+        if (!$chamber || $chamber->doctor_id != $request->doctor_id) {
+            return redirect()->back()->with('error', 'Invalid chamber selection.');
+        }
+
         $appointment = Appointment::create([
-            'patient_id' => auth()->user()->patient->id,
+            'patient_id' => $patient->id,
             'doctor_id' => $request->doctor_id,
             'chamber_id' => $request->chamber_id,
             'appointment_date' => $request->appointment_date,
             'status' => 'scheduled',
-            'reason' => $request->reason,
+            'notes' => $request->notes,
         ]);
 
-        // Send emails using Brevo API
-        $this->brevoService->sendAppointmentBooked($appointment);
+        // Send booked email to patient and doctor
+        try {
+            Log::info('Sending booked email to patient: ' . $patient->user->email);
+            Mail::to($patient->user->email)->send(new AppointmentBooked($appointment));
+            Log::info('Sending booked email to doctor: ' . $appointment->doctor->user->email);
+            Mail::to($appointment->doctor->user->email)->send(new AppointmentBooked($appointment));
+        } catch (\Exception $e) {
+            Log::error('Email sending failed: ' . $e->getMessage());
+            // Continue without failing the request
+        }
 
-        return redirect()->route('appointments.show', $appointment)
-            ->with('success', 'Appointment booked successfully. Confirmation emails have been sent.');
+        return redirect()->route('patient.appointments')->with('success', 'Appointment booked successfully!');
     }
 
     public function myAppointments()
@@ -68,23 +90,27 @@ class AppointmentController extends Controller
             ->latest()
             ->get();
 
-        return view('appointments.my-appointments', compact('appointments'));
+        return view('patient.appointments', compact('appointments'));
     }
 
     public function updateStatus(Request $request, Appointment $appointment)
     {
-        $request->validate([
-            'status' => 'required|in:scheduled,completed,cancelled',
-        ]);
+        // Handle both GET (query param) and POST/PATCH (form data)
+        $status = $request->input('status') ?? $request->query('status');
+        if (!$status || !in_array($status, ['scheduled', 'completed', 'cancelled'])) {
+            return redirect()->back()->with('error', 'Invalid status.');
+        }
 
         $oldStatus = $appointment->status;
-        $appointment->update(['status' => $request->status]);
+        $appointment->update(['status' => $status]);
 
         // Send emails based on status change
-        if ($request->status === 'completed' && $oldStatus !== 'completed') {
-            $this->brevoService->sendAppointmentCompleted($appointment);
-        } elseif ($request->status === 'cancelled' && $oldStatus !== 'cancelled') {
-            $this->brevoService->sendAppointmentCancelled($appointment);
+        if ($status === 'completed' && $oldStatus !== 'completed') {
+            Log::info('Sending completed email to: ' . $appointment->patient->user->email);
+            Mail::to($appointment->patient->user->email)->send(new AppointmentCompleted($appointment));
+        } elseif ($status === 'cancelled' && $oldStatus !== 'cancelled') {
+            Log::info('Sending cancelled email to: ' . $appointment->patient->user->email);
+            Mail::to($appointment->patient->user->email)->send(new AppointmentCancelled($appointment));
         }
 
         return redirect()->back()->with('success', 'Appointment status updated successfully.');
@@ -103,7 +129,7 @@ class AppointmentController extends Controller
 
         $appointment->update(['payment_status' => $request->payment_status]);
 
-        return back()->with('success', 'Payment status updated.');
+        return redirect()->back()->with('success', 'Payment status updated!');
     }
 
     public function updateNotes(Request $request, Appointment $appointment)
@@ -132,7 +158,7 @@ class AppointmentController extends Controller
         }
 
         // Can't edit completed or cancelled appointments
-        if (in_array($appointment->appointment_status, ['completed', 'cancelled'])) {
+        if (in_array($appointment->status, ['completed', 'cancelled'])) {
             return back()->with('error', 'Cannot edit completed or cancelled appointments.');
         }
 
@@ -152,21 +178,21 @@ class AppointmentController extends Controller
         }
 
         // Can't update completed or cancelled appointments
-        if (in_array($appointment->appointment_status, ['completed', 'cancelled'])) {
+        if (in_array($appointment->status, ['completed', 'cancelled'])) {
             return back()->with('error', 'Cannot update completed or cancelled appointments.');
         }
 
         $validated = $request->validate([
             'chamber_id' => 'required|exists:chambers,id',
             'appointment_date' => 'required|date|after:now',
-            'reason' => 'required|string|max:500'
+            'notes' => 'nullable|string|max:500'
         ]);
 
         // Update appointment
         $appointment->update([
             'chamber_id' => $validated['chamber_id'],
             'appointment_date' => $validated['appointment_date'],
-            'reason' => $validated['reason'],
+            'notes' => $validated['notes'],
             'updated_at' => now()
         ]);
 
@@ -183,17 +209,17 @@ class AppointmentController extends Controller
         }
 
         // Can't cancel already completed or cancelled appointments
-        if (in_array($appointment->appointment_status, ['completed', 'cancelled'])) {
-            return back()->with('error', 'This appointment is already ' . $appointment->appointment_status);
+        if (in_array($appointment->status, ['completed', 'cancelled'])) {
+            return back()->with('error', 'This appointment is already ' . $appointment->status);
         }
 
         $appointment->update([
-            'appointment_status' => 'cancelled',
+            'status' => 'cancelled',
             'updated_at' => now()
         ]);
 
-        // Send cancellation emails
-        $this->brevoService->sendAppointmentCancelled($appointment);
+        // Send cancellation email
+        Mail::to($appointment->patient->user->email)->send(new AppointmentCancelled($appointment));
 
         return back()->with('success', 'Appointment cancelled successfully!');
     }

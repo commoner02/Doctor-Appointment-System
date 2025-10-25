@@ -19,12 +19,11 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Doctor</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chamber</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fee</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Working Days</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -34,35 +33,27 @@
                                         <div class="text-sm font-medium text-gray-900">{{ $appointment->doctor->user->name }}</div>
                                         <div class="text-xs text-gray-500">{{ $appointment->doctor->speciality }}</div>
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                        {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y') }}
-                                    </td>
                                     <td class="px-6 py-4 text-sm text-gray-700">
                                         {{ $appointment->chamber->name ?? 'N/A' }}
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                        ৳{{ number_format($appointment->chamber->fee ?? 0, 2) }}
+                                    <td class="px-6 py-4 text-sm text-gray-700">
+                                        {{ $appointment->chamber->working_days ?? 'N/A' }}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 text-xs rounded-full
-                                                    {{ $appointment->status === 'completed' ? 'bg-green-100 text-green-800' : '' }}
-                                                    {{ $appointment->status === 'scheduled' ? 'bg-blue-100 text-blue-800' : '' }}
-                                                    {{ $appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
-                                            {{ ucfirst($appointment->status) }}
-                                        </span>
+                                    <td class="px-6 py-4 text-sm text-gray-700">
+                                        {{ $appointment->chamber->start_time ?? 'N/A' }} -
+                                        {{ $appointment->chamber->end_time ?? 'N/A' }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">
+                                        {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y') }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <span
                                             class="px-2 py-1 text-xs rounded-full
-                                                    {{ $appointment->payment_status === 'paid' ? 'bg-green-100 text-green-800' : '' }}
-                                                    {{ $appointment->payment_status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                                    {{ $appointment->payment_status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
-                                            {{ ucfirst($appointment->payment_status) }}
+                                                                            {{ $appointment->status === 'completed' ? 'bg-green-100 text-green-800' : '' }}
+                                                                            {{ $appointment->status === 'scheduled' ? 'bg-blue-100 text-blue-800' : '' }}
+                                                                            {{ $appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
+                                            {{ ucfirst($appointment->status) }}
                                         </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <a href="{{ route('patient.appointments', $appointment->id) }}"
-                                            class="text-primary-600 hover:text-primary-700">View</a>
                                     </td>
                                 </tr>
                             @endforeach

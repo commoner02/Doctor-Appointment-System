@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{appointment}', [AppointmentController::class, 'show'])->name('show');
         Route::get('/{appointment}/edit', [AppointmentController::class, 'edit'])->name('edit');
         Route::put('/{appointment}', [AppointmentController::class, 'update'])->name('update');
-        Route::patch('/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('update-status');
+        Route::match(['get', 'patch'], '/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
         Route::patch('/{appointment}/payment', [AppointmentController::class, 'updatePayment'])->name('update-payment');
         Route::patch('/{appointment}/notes', [AppointmentController::class, 'updateNotes'])->name('update-notes');
         Route::delete('/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
@@ -80,6 +80,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{chamber}', [ChamberController::class, 'update'])->name('update');
         Route::delete('/{chamber}', [ChamberController::class, 'destroy'])->name('destroy');
     });
+
+    Route::get('/appointments/create/{doctor}', [AppointmentController::class, 'create'])->name('appointments.create');
 });
 
 // Waiting page for unverified users
@@ -105,17 +107,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/admin/chambers/{chamber}/toggle-status', [AdminController::class, 'toggleChamberStatus'])->name('admin.chambers.toggle-status');
 });
 
-// Temporary route for testing Brevo email service
-Route::get('/test-brevo', function () {
-    $service = app(\App\Services\BrevoEmailService::class);
+// // Temporary route for testing Brevo email service
+// Route::get('/test-brevo', function () {
+//     $service = app(\App\Services\BrevoEmailService::class);
 
-    // Create a dummy appointment for testing (replace with real IDs)
-    $appointment = \App\Models\Appointment::first();
+//     // Create a dummy appointment for testing (replace with real IDs)
+//     $appointment = \App\Models\Appointment::first();
 
-    if ($appointment) {
-        $result = $service->sendAppointmentBooked($appointment);
-        return $result ? 'Email sent successfully!' : 'Failed to send email.';
-    }
+//     if ($appointment) {
+//         $result = $service->sendAppointmentBooked($appointment);
+//         return $result ? 'Email sent successfully!' : 'Failed to send email.';
+//     }
 
-    return 'No appointment found for testing.';
-});
+//     return 'No appointment found for testing.';
+// });

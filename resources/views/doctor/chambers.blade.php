@@ -26,10 +26,6 @@
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-lg font-semibold text-gray-900">{{ $chamber->name }}</h3>
                             <div class="flex space-x-2">
-                                <a href="{{ route('chambers.edit', $chamber->id) }}"
-                                    class="text-gray-600 hover:text-primary-600">
-                                    <i class="fas fa-edit"></i>
-                                </a>
                                 <form action="{{ route('chambers.destroy', $chamber->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
