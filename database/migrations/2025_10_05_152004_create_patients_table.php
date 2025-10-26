@@ -18,7 +18,6 @@ return new class extends Migration {
             $table->date('date_of_birth')->nullable();
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
             $table->string('blood_group')->nullable();
-            $table->string('emergency_contact')->nullable();
             $table->timestamps();
         });
     }

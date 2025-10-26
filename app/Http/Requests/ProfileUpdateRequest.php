@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,31 +15,27 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user = $this->user();
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique(User::class)->ignore($this->user()->id),
+            ],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'gender' => ['nullable', 'string', 'in:male,female,other'],
         ];
 
-        // Add role-specific validation
-        if ($user->isPatient()) {
+        // Role-specific validation
+        if ($this->user()->role === 'doctor') {
             $rules = array_merge($rules, [
-                'first_name' => ['required', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'phone' => ['required', 'string', 'max:20'],
-                'gender' => ['required', 'in:Male,Female,Other'],
-                'date_of_birth' => ['required', 'date'],
-                'blood_group' => ['required', 'string'],
-                'address' => ['required', 'string'],
-            ]);
-        } elseif ($user->isDoctor()) {
-            $rules = array_merge($rules, [
-                'first_name' => ['required', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'phone' => ['required', 'string', 'max:20'],
-                'speciality' => ['required', 'string'],
-                'license_no' => ['required', 'string'],
-                'qualifications' => ['required', 'string'],
+                'speciality' => ['nullable', 'string', 'max:255'],
+                'experience' => ['nullable', 'integer', 'min:0', 'max:50'],
+                'qualifications' => ['nullable', 'string', 'max:500'],
             ]);
         }
 

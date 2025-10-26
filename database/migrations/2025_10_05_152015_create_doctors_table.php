@@ -15,8 +15,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('speciality')->nullable();
             $table->text('qualifications')->nullable();
-            $table->integer('experience')->nullable(); // years
-            $table->text('bio')->nullable();
+            $table->integer('experience')->nullable();
             $table->string('phone')->nullable();
             $table->string('license_number')->nullable();
             $table->enum('verification_status', ['pending', 'verified', 'rejected'])->default('pending');

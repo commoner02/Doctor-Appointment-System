@@ -9,15 +9,25 @@ class Patient extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'user_id',
         'phone',
         'address',
         'date_of_birth',
         'gender',
-        'emergency_contact',
+        'blood_group',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -25,13 +35,11 @@ class Patient extends Model
         ];
     }
 
+    /**
+     * Get the user that owns the patient.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function appointments()
-    {
-        return $this->hasMany(Appointment::class);
     }
 }
